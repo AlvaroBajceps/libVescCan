@@ -35,7 +35,7 @@ typedef struct _VESC_RawFrame
 } _VESC_GCC_ATTRIBUTE_PACKED VESC_RawFrame;
 
 /// <summary>
-/// Frame for commanding. 
+/// Frame for commanding.
 /// Convert to VESC_RawFrame before sending!
 /// </summary>
 typedef struct _VESC_CommandFrame

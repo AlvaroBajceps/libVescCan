@@ -11,7 +11,7 @@
 
 #ifdef __GNUC__
 #define _VESC_GCC_ATTRIBUTE_PACKED __attribute__((packed))
-#else 
+#else
 #define _VESC_GCC_ATTRIBUTE_PACKED
 #endif //__GNUC__
 
