@@ -1,0 +1,5 @@
+# ignore build dir
+build/
+
+# ignore vscode dir
+.vscode/
