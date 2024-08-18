@@ -1,4 +1,4 @@
-#include "libVescCan/VESC_Convert.h"
+#include <libVescCan/VESC_Convert.h>
 
 bool VESC_convertCmdToRaw(VESC_RawFrame* out, const VESC_CommandFrame* in)
 {

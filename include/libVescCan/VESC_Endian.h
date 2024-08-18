@@ -1,7 +1,7 @@
 #ifndef VESC_Endian_h_
 #define VESC_Endian_h_
 
-#include "VESC_Defines.h"
+#include <libVescCan/VESC_Defines.h>
 
 int16_t _VESC_b16_swap(int16_t val);
 int32_t _VESC_b32_swap(int32_t val);

@@ -1,10 +1,10 @@
 #ifndef VESC_Convert_h_
 #define VESC_Convert_h_
 
-#include "VESC_Defines.h"
-#include "VESC_Consts.h"
-#include "VESC_Structs.h"
-#include "VESC_Endian.h"
+#include <libVescCan/VESC_Defines.h>
+#include <libVescCan/VESC_Consts.h>
+#include <libVescCan/VESC_Structs.h>
+#include <libVescCan/VESC_Endian.h>
 
 #define _VESC_WriteRawData16(rawf,off,in,scale) *( (int16_t*)&rawf->rawData[off] ) = VESC_htobe16( (int16_t)(in * ((float)scale)) )
 #define _VESC_WriteRawData32(rawf,off,in,scale) *( (int32_t*)&rawf->rawData[off] ) = VESC_htobe32( (int32_t)(in * ((float)scale)) )

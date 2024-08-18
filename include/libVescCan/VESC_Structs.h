@@ -1,8 +1,8 @@
 #ifndef VESC_Structs_h_
 #define VESC_Structs_h_
 
-#include "VESC_Defines.h"
-#include "VESC_Consts.h"
+#include <libVescCan/VESC_Defines.h>
+#include <libVescCan/VESC_Consts.h>
 
 //****
 // structs

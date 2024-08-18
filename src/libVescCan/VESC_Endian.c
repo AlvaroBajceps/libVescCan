@@ -1,4 +1,4 @@
-#include "libVescCan/VESC_Endian.h"
+#include <libVescCan/VESC_Endian.h>
 
 int16_t _VESC_b16_swap(int16_t val)
 {

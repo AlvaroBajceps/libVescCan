@@ -1,7 +1,7 @@
 #ifndef VESC_Consts_h_
 #define VESC_Consts_h_
 
-#include "VESC_Defines.h"
+#include <libVescCan/VESC_Defines.h>
 
 //****
 // typedefs
