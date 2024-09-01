@@ -5,6 +5,7 @@
 #include <libVescCan/VESC_Consts.h>
 #include <libVescCan/VESC_Structs.h>
 #include <libVescCan/VESC_Endian.h>
+#include <libVescCan/VESC_Status_10_Consts.h>
 
 #define _VESC_WriteRawData8(rawf,off,in,scale) *( (int8_t*)&rawf->rawData[off] ) = (int8_t)(in * ((float)scale))
 #define _VESC_WriteRawData16(rawf,off,in,scale) *( (int16_t*)&rawf->rawData[off] ) = VESC_htobe16( (int16_t)(in * ((float)scale)) )
@@ -32,6 +33,7 @@
     const VESC_Status_7*:VESC_convertStatus7ToRaw, \
     const VESC_Status_8*:VESC_convertStatus8ToRaw, \
     const VESC_Status_9*:VESC_convertStatus9ToRaw, \
+    const VESC_Status_10*:VESC_convertStatus10ToRaw, \
     VESC_CommandFrame*:VESC_convertCmdToRaw, \
     VESC_Status_1*:VESC_convertStatus1ToRaw, \
     VESC_Status_2*:VESC_convertStatus2ToRaw, \
@@ -41,7 +43,8 @@
     VESC_Status_6*:VESC_convertStatus6ToRaw, \
     VESC_Status_7*:VESC_convertStatus7ToRaw, \
     VESC_Status_8*:VESC_convertStatus8ToRaw, \
-    VESC_Status_9*:VESC_convertStatus9ToRaw \
+    VESC_Status_9*:VESC_convertStatus9ToRaw, \
+    VESC_Status_10*:VESC_convertStatus10ToRaw \
 )(out,in)
 #endif
 
@@ -65,6 +68,8 @@ bool VESC_convertStatus8ToRaw(VESC_RawFrame* out, const VESC_Status_8* in);
 
 bool VESC_convertStatus9ToRaw(VESC_RawFrame* out, const VESC_Status_9* in);
 
+bool VESC_convertStatus10ToRaw(VESC_RawFrame* out, const VESC_Status_10* in);
+
 
 //****
 // from VESC_RawFrame
@@ -81,7 +86,8 @@ bool VESC_convertStatus9ToRaw(VESC_RawFrame* out, const VESC_Status_9* in);
     VESC_Status_6*:VESC_convertRawToStatus6, \
     VESC_Status_7*:VESC_convertRawToStatus7, \
     VESC_Status_8*:VESC_convertRawToStatus8, \
-    VESC_Status_9*:VESC_convertRawToStatus9 \
+    VESC_Status_9*:VESC_convertRawToStatus9, \
+    VESC_Status_10*:VESC_convertRawToStatus10 \
 )(out,in)
 #endif
 
@@ -104,5 +110,7 @@ bool VESC_convertRawToStatus7(VESC_Status_7* out, const VESC_RawFrame* in);
 bool VESC_convertRawToStatus8(VESC_Status_8* out, const VESC_RawFrame* in);
 
 bool VESC_convertRawToStatus9(VESC_Status_9* out, const VESC_RawFrame* in);
+
+bool VESC_convertRawToStatus10(VESC_Status_10* out, const VESC_RawFrame* in);
 
 #endif //VESC_Convert_h_

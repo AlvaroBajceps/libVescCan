@@ -3,6 +3,7 @@
 
 #include <libVescCan/VESC_Defines.h>
 #include <libVescCan/VESC_Consts.h>
+#include <libVescCan/VESC_Status_10_Consts.h>
 
 //****
 // structs
@@ -150,5 +151,18 @@ typedef struct _VESC_Status_9
     float nitrogen;
     float phosphorus;
 } VESC_Status_9;
+
+/// <summary>
+/// Status 10 frame (note: not standard frame)
+/// See VESC_Status_10_Consts.h for enum values.
+/// Convert to VESC_RawFrame before sending!
+/// </summary>
+typedef struct _VESC_Status_10
+{
+    VESC_Id_t vescID;
+    VESC_Status_10_flags_t flags;
+    VESC_Status_10_CommunicationState communicationState;
+	VESC_Status_10_ControlMode controlMode;
+} VESC_Status_10;
 
 #endif //VESC_Structs_h_
