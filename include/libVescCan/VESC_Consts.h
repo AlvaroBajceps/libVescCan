@@ -42,6 +42,10 @@ typedef int16_t VESC_Status_8_distance_t;
 typedef int8_t VESC_Status_8_humidity_t;
 typedef int8_t VESC_Status_8_vibrations_t;
 
+typedef int16_t VESC_Status_9_potassium_t;
+typedef int16_t VESC_Status_9_nitrogen_t;
+typedef int16_t VESC_Status_9_phosphorus_t;
+
 
 //****
 // dlen
@@ -55,6 +59,7 @@ typedef int8_t VESC_Status_8_vibrations_t;
 #define VESC_CAN_STATUS_6_DLEN 8
 #define VESC_CAN_STATUS_7_DLEN 8
 #define VESC_CAN_STATUS_8_DLEN 6
+#define VESC_CAN_STATUS_9_DLEN 6
 
 
 //****
@@ -85,7 +90,8 @@ typedef enum VESC_Command_enum
     VESC_COMMAND_STATUS_6 = 28,
 	// non standard
     VESC_COMMAND_STATUS_7 = 29,
-    VESC_COMMAND_STATUS_8 = 30
+    VESC_COMMAND_STATUS_8 = 30,
+    VESC_COMMAND_STATUS_9 = 31
 } VESC_Command;
 
 
@@ -134,6 +140,10 @@ typedef enum VESC_Command_enum
 #define VESC_SCALE_STATUS_8_DISTANCE 10
 #define VESC_SCALE_STATUS_8_HUMIDITY 2
 #define VESC_SCALE_STATUS_8_VIBRATIONS VESC_SCALE_NA
+
+#define VESC_SCALE_STATUS_9_POTASSIUM 1
+#define VESC_SCALE_STATUS_9_NITROGEN 1
+#define VESC_SCALE_STATUS_9_PHOSPHORUS 100
 
 
 //****
@@ -192,6 +202,13 @@ enum _VESC_offsetIdx_Status_8_enum
 	_VESC_OFFSETIDX_STATUS_8_DISTANCE,
 	_VESC_OFFSETIDX_STATUS_8_HUMIDITY,
 	_VESC_OFFSETIDX_STATUS_8_VIBRATIONS,
+};
+
+enum _VESC_offsetIdx_Status_9_enum
+{
+	_VESC_OFFSETIDX_STATUS_9_POTASSIUM = 0,
+	_VESC_OFFSETIDX_STATUS_9_NITROGEN,
+	_VESC_OFFSETIDX_STATUS_9_PHOSPHORUS,
 };
 
 
@@ -253,6 +270,13 @@ static const int _VESC_offset_Status_8[] =
 	sizeof(VESC_Status_8_weight_t),
 	sizeof(VESC_Status_8_weight_t) + sizeof(VESC_Status_8_distance_t),
 	sizeof(VESC_Status_8_weight_t) + sizeof(VESC_Status_8_distance_t) + sizeof(VESC_Status_8_humidity_t),
+};
+
+static const int _VESC_offset_Status_9[] =
+{
+    0,
+	sizeof(VESC_Status_9_potassium_t),
+	sizeof(VESC_Status_9_potassium_t) + sizeof(VESC_Status_9_nitrogen_t),
 };
 
 #endif // VESC_Consts_h_

@@ -139,4 +139,16 @@ typedef struct _VESC_Status_8
 	bool vibrations;
 } VESC_Status_8;
 
+/// <summary>
+/// Status 9 frame (note: not standard frame)
+/// Convert to VESC_RawFrame before sending!
+/// </summary>
+typedef struct _VESC_Status_9
+{
+    VESC_Id_t vescID;
+    float potassium;
+    float nitrogen;
+    float phosphorus;
+} VESC_Status_9;
+
 #endif //VESC_Structs_h_

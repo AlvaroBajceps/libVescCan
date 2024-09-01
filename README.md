@@ -117,7 +117,7 @@ There are 10 different status messages available with the following data:
 | VESC_COMMAND_STATUS_6 | 28 | ADC1, ADC2, ADC3, PPM | BLDC |
 | VESC_COMMAND_STATUS_7 | 29 | Precise Position | Stepper |
 | VESC_COMMAND_STATUS_8 | 30 | Weight, Distance, Humidity, Vibrations | Probe |
-| VESC_COMMAND_STATUS_9 | TBD | Potassium, Nitrogen, Phosphorus | Probe |
+| VESC_COMMAND_STATUS_9 | 31 | Potassium, Nitrogen, Phosphorus | Probe |
 | VESC_COMMAND_STATUS_10 | TBD | MCU States | ROS (NUC) |
 
 The content of the status messages is encoded as follows:
