@@ -6,10 +6,12 @@
 #include <libVescCan/VESC_Structs.h>
 #include <libVescCan/VESC_Endian.h>
 
+#define _VESC_WriteRawData8(rawf,off,in,scale) *( (int8_t*)&rawf->rawData[off] ) = (int8_t)(in * ((float)scale))
 #define _VESC_WriteRawData16(rawf,off,in,scale) *( (int16_t*)&rawf->rawData[off] ) = VESC_htobe16( (int16_t)(in * ((float)scale)) )
 #define _VESC_WriteRawData32(rawf,off,in,scale) *( (int32_t*)&rawf->rawData[off] ) = VESC_htobe32( (int32_t)(in * ((float)scale)) )
 #define _VESC_WriteRawData64(rawf,off,in,scale) *( (int64_t*)&rawf->rawData[off] ) = VESC_htobe64( (int64_t)(in * ((float)scale)) )
 
+#define _VESC_ReadRawData8(dst,rawf,off,scale) dst = *((int8_t*)&rawf->rawData[off]) / ((float)scale)
 #define _VESC_ReadRawData16(dst,rawf,off,scale) dst = VESC_be16toh(*((int16_t*)&rawf->rawData[off])) / ((float)scale)
 #define _VESC_ReadRawData32(dst,rawf,off,scale) dst = VESC_be32toh(*((int32_t*)&rawf->rawData[off])) / ((float)scale)
 #define _VESC_ReadRawData64(dst,rawf,off,scale) dst = VESC_be64toh(*((int64_t*)&rawf->rawData[off])) / ((float)scale)
