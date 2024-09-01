@@ -194,8 +194,7 @@ The content of the status messages is encoded as follows:
 | B0 | Flags: <br/><ul><li>b0 -> Pad Connected</li><li>b1 -> Motor Cut-Off button</li></ul> | N/A | N/A | ROS |
 | B1 | Communication State | ENUM | N/A | ROS |
 | B2 | Control Mode   | ENUM | N/A | ROS |
-| B3 | Can-bus State | ENUM | N/A | ROS |
-| B4 - B7 | Unused | | | |
+| B3 - B7 | Unused | | | |
 
 ## Frequently Asked Questions (FAQ)
 
