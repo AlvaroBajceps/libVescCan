@@ -30,6 +30,7 @@
     const VESC_Status_5*:VESC_convertStatus5ToRaw, \
     const VESC_Status_6*:VESC_convertStatus6ToRaw, \
     const VESC_Status_7*:VESC_convertStatus7ToRaw, \
+    const VESC_Status_8*:VESC_convertStatus8ToRaw, \
     VESC_CommandFrame*:VESC_convertCmdToRaw, \
     VESC_Status_1*:VESC_convertStatus1ToRaw, \
     VESC_Status_2*:VESC_convertStatus2ToRaw, \
@@ -37,7 +38,8 @@
     VESC_Status_4*:VESC_convertStatus4ToRaw, \
     VESC_Status_5*:VESC_convertStatus5ToRaw, \
     VESC_Status_6*:VESC_convertStatus6ToRaw, \
-    VESC_Status_7*:VESC_convertStatus7ToRaw \
+    VESC_Status_7*:VESC_convertStatus7ToRaw, \
+    VESC_Status_8*:VESC_convertStatus8ToRaw \
 )(out,in)
 #endif
 
@@ -57,6 +59,8 @@ bool VESC_convertStatus6ToRaw(VESC_RawFrame* out, const VESC_Status_6* in);
 
 bool VESC_convertStatus7ToRaw(VESC_RawFrame* out, const VESC_Status_7* in);
 
+bool VESC_convertStatus8ToRaw(VESC_RawFrame* out, const VESC_Status_8* in);
+
 
 //****
 // from VESC_RawFrame
@@ -71,7 +75,8 @@ bool VESC_convertStatus7ToRaw(VESC_RawFrame* out, const VESC_Status_7* in);
     VESC_Status_4*:VESC_convertRawToStatus4, \
     VESC_Status_5*:VESC_convertRawToStatus5, \
     VESC_Status_6*:VESC_convertRawToStatus6, \
-    VESC_Status_7*:VESC_convertRawToStatus7 \
+    VESC_Status_7*:VESC_convertRawToStatus7, \
+    VESC_Status_8*:VESC_convertRawToStatus8 \
 )(out,in)
 #endif
 
@@ -90,5 +95,7 @@ bool VESC_convertRawToStatus5(VESC_Status_5* out, const VESC_RawFrame* in);
 bool VESC_convertRawToStatus6(VESC_Status_6* out, const VESC_RawFrame* in);
 
 bool VESC_convertRawToStatus7(VESC_Status_7* out, const VESC_RawFrame* in);
+
+bool VESC_convertRawToStatus8(VESC_Status_8* out, const VESC_RawFrame* in);
 
 #endif //VESC_Convert_h_

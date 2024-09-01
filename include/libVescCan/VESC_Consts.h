@@ -37,6 +37,11 @@ typedef int16_t VESC_Status_6_ppm_t;
 
 typedef int64_t VESC_Status_7_precisePos_t;
 
+typedef int16_t VESC_Status_8_weight_t;
+typedef int16_t VESC_Status_8_distance_t;
+typedef int8_t VESC_Status_8_humidity_t;
+typedef int8_t VESC_Status_8_vibrations_t;
+
 
 //****
 // dlen
@@ -49,6 +54,7 @@ typedef int64_t VESC_Status_7_precisePos_t;
 #define VESC_CAN_STATUS_5_DLEN 6 // hello there
 #define VESC_CAN_STATUS_6_DLEN 8
 #define VESC_CAN_STATUS_7_DLEN 8
+#define VESC_CAN_STATUS_8_DLEN 6
 
 
 //****
@@ -77,13 +83,17 @@ typedef enum VESC_Command_enum
     VESC_COMMAND_STATUS_4 = 16,
     VESC_COMMAND_STATUS_5 = 27,
     VESC_COMMAND_STATUS_6 = 28,
-    VESC_COMMAND_STATUS_7 = 29 // non standard
+	// non standard
+    VESC_COMMAND_STATUS_7 = 29,
+    VESC_COMMAND_STATUS_8 = 30
 } VESC_Command;
 
 
 //****
 // VESC scales
 //****
+
+#define VESC_SCALE_NA 1
 
 #define VESC_SCALE_SET_DUTY 100000
 #define VESC_SCALE_SET_CURRENT 1000
@@ -119,6 +129,12 @@ typedef enum VESC_Command_enum
 #define VESC_SCALE_STATUS_6_PPM 1000
 
 #define VESC_SCALE_STATUS_7_PRECISEPOS 1000000
+
+#define VESC_SCALE_STATUS_8_WEIGHT 10
+#define VESC_SCALE_STATUS_8_DISTANCE 10
+#define VESC_SCALE_STATUS_8_HUMIDITY 2
+#define VESC_SCALE_STATUS_8_VIBRATIONS VESC_SCALE_NA
+
 
 //****
 // enum for offsets
@@ -168,6 +184,14 @@ enum _VESC_offsetIdx_Status_6_enum
 enum _VESC_offsetIdx_Status_7_enum
 {
     _VESC_OFFSETIDX_STATUS_7_PRECISEPOS = 0
+};
+
+enum _VESC_offsetIdx_Status_8_enum
+{
+	_VESC_OFFSETIDX_STATUS_8_WEIGHT = 0,
+	_VESC_OFFSETIDX_STATUS_8_DISTANCE,
+	_VESC_OFFSETIDX_STATUS_8_HUMIDITY,
+	_VESC_OFFSETIDX_STATUS_8_VIBRATIONS,
 };
 
 
@@ -221,6 +245,14 @@ static const int _VESC_offset_Status_6[] =
 static const int _VESC_offset_Status_7[] =
 {
     0
+};
+
+static const int _VESC_offset_Status_8[] =
+{
+    0,
+	sizeof(VESC_Status_8_weight_t),
+	sizeof(VESC_Status_8_weight_t) + sizeof(VESC_Status_8_distance_t),
+	sizeof(VESC_Status_8_weight_t) + sizeof(VESC_Status_8_distance_t) + sizeof(VESC_Status_8_humidity_t),
 };
 
 #endif // VESC_Consts_h_

@@ -126,4 +126,17 @@ typedef struct _VESC_Status_7
     float precisePos;
 } VESC_Status_7;
 
+/// <summary>
+/// Status 8 frame (note: not standard frame)
+/// Convert to VESC_RawFrame before sending!
+/// </summary>
+typedef struct _VESC_Status_8
+{
+    VESC_Id_t vescID;
+    float weight;
+    float distance;
+    float humidity;
+	bool vibrations;
+} VESC_Status_8;
+
 #endif //VESC_Structs_h_
