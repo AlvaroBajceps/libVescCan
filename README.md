@@ -116,9 +116,9 @@ There are 10 different status messages available with the following data:
 | VESC_COMMAND_STATUS_5 | 27 | Tachometer, Voltage In | BLDC |
 | VESC_COMMAND_STATUS_6 | 28 | ADC1, ADC2, ADC3, PPM | BLDC |
 | VESC_COMMAND_STATUS_7 | 29 | Precise Position | Stepper |
-| VESC_COMMAND_STATUS_8 | TBD | Weight, Distance, Humidity, Vibrations | Probe |
-| VESC_COMMAND_STATUS_9 | TBD | Potassium, Nitrogen, Phosphorus | Probe |
-| VESC_COMMAND_STATUS_10 | TBD | MCU States | ROS (NUC) |
+| VESC_COMMAND_STATUS_8 | 30 | Weight, Distance, Humidity, Vibrations | Probe |
+| VESC_COMMAND_STATUS_9 | 31 | Potassium, Nitrogen, Phosphorus | Probe |
+| VESC_COMMAND_STATUS_10 | 32 | MCU States | ROS (NUC) |
 
 The content of the status messages is encoded as follows:
 
@@ -194,8 +194,7 @@ The content of the status messages is encoded as follows:
 | B0 | Flags: <br/><ul><li>b0 -> Pad Connected</li><li>b1 -> Motor Cut-Off button</li></ul> | N/A | N/A | ROS |
 | B1 | Communication State | ENUM | N/A | ROS |
 | B2 | Control Mode   | ENUM | N/A | ROS |
-| B3 | Can-bus State | ENUM | N/A | ROS |
-| B4 - B7 | Unused | | | |
+| B3 - B7 | Unused | | | |
 
 ## Frequently Asked Questions (FAQ)
 

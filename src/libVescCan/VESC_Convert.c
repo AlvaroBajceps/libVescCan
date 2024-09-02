@@ -136,6 +136,51 @@ bool VESC_convertStatus7ToRaw(VESC_RawFrame* out, const VESC_Status_7* in)
 	return true;
 }
 
+bool VESC_convertStatus8ToRaw(VESC_RawFrame* out, const VESC_Status_8* in)
+{
+	out->vescID = in->vescID;
+	out->command = VESC_COMMAND_STATUS_8;
+	out->_reserved = VESC_CAN_EXTID_FLAG;
+	out->can_dlc = VESC_CAN_STATUS_8_DLEN;
+
+	_VESC_WriteRawData16(out, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_WEIGHT], in->weight, VESC_SCALE_STATUS_8_WEIGHT);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_DISTANCE], in->distance, VESC_SCALE_STATUS_8_DISTANCE);
+	_VESC_WriteRawData8u(out, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_HUMIDITY], in->humidity, VESC_SCALE_STATUS_8_HUMIDITY);
+	_VESC_WriteRawData8u(out, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_VIBRATIONS], in->vibrations, VESC_SCALE_NA);
+
+	return true;
+}
+
+bool VESC_convertStatus9ToRaw(VESC_RawFrame* out, const VESC_Status_9* in)
+{
+	out->vescID = in->vescID;
+	out->command = VESC_COMMAND_STATUS_9;
+	out->_reserved = VESC_CAN_EXTID_FLAG;
+	out->can_dlc = VESC_CAN_STATUS_9_DLEN;
+
+	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_POTASSIUM], in->potassium, VESC_SCALE_STATUS_9_POTASSIUM);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_NITROGEN], in->nitrogen, VESC_SCALE_STATUS_9_NITROGEN);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PHOSPHORUS], in->phosphorus, VESC_SCALE_STATUS_9_PHOSPHORUS);
+
+	return true;
+}
+
+bool VESC_convertStatus10ToRaw(VESC_RawFrame* out, const VESC_Status_10* in)
+{
+	out->vescID = in->vescID;
+	out->command = VESC_COMMAND_STATUS_10;
+	out->_reserved = VESC_CAN_EXTID_FLAG;
+	out->can_dlc = VESC_CAN_STATUS_10_DLEN;
+
+	_VESC_WriteRawData8u(out, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_FLAGS], in->flags, VESC_SCALE_STATUS_10_FLAGS);
+	_VESC_WriteRawData8u(out, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_COMMUNICATIONSTATE], in->communicationState, VESC_SCALE_STATUS_10_COMMUNICATIONSTATE);
+	_VESC_WriteRawData8u(out, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_CONTROLMODE], in->controlMode, VESC_SCALE_STATUS_10_CONTROLMODE);
+
+	return true;
+}
+
+
+
 bool VESC_convertRawToCmd(VESC_CommandFrame* out, const VESC_RawFrame* in)
 {
 	switch (in->command)
@@ -268,6 +313,49 @@ bool VESC_convertRawToStatus7(VESC_Status_7* out, const VESC_RawFrame* in)
 	out->vescID = in->vescID;
 
 	_VESC_ReadRawData64(out->precisePos, in, _VESC_offset_Status_7[_VESC_OFFSETIDX_STATUS_7_PRECISEPOS], VESC_SCALE_STATUS_7_PRECISEPOS);
+
+	return true;
+}
+
+bool VESC_convertRawToStatus8(VESC_Status_8* out, const VESC_RawFrame* in)
+{
+	if (in->command != VESC_COMMAND_STATUS_8)
+		return false;
+
+	out->vescID = in->vescID;
+
+	_VESC_ReadRawData16(out->weight, in, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_WEIGHT], VESC_SCALE_STATUS_8_WEIGHT);
+	_VESC_ReadRawData16(out->distance, in, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_DISTANCE], VESC_SCALE_STATUS_8_DISTANCE);
+	_VESC_ReadRawData8u(out->humidity, in, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_HUMIDITY], VESC_SCALE_STATUS_8_HUMIDITY);
+	_VESC_ReadRawData8u(out->vibrations, in, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_VIBRATIONS], VESC_SCALE_STATUS_8_VIBRATIONS);
+
+	return true;
+}
+
+bool VESC_convertRawToStatus9(VESC_Status_9* out, const VESC_RawFrame* in)
+{
+	if (in->command != VESC_COMMAND_STATUS_9)
+		return false;
+
+	out->vescID = in->vescID;
+
+	_VESC_ReadRawData16(out->potassium, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_POTASSIUM], VESC_SCALE_STATUS_9_POTASSIUM);
+	_VESC_ReadRawData16(out->nitrogen, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_NITROGEN], VESC_SCALE_STATUS_9_NITROGEN);
+	_VESC_ReadRawData16(out->phosphorus, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PHOSPHORUS], VESC_SCALE_STATUS_9_PHOSPHORUS);
+
+	return true;
+}
+
+bool VESC_convertRawToStatus10(VESC_Status_10* out, const VESC_RawFrame* in)
+{
+	if (in->command != VESC_COMMAND_STATUS_10)
+		return false;
+
+	out->vescID = in->vescID;
+
+	_VESC_ReadRawData8u(out->flags, in, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_FLAGS], VESC_SCALE_STATUS_10_FLAGS);
+	_VESC_ReadRawData8u(out->communicationState, in, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_COMMUNICATIONSTATE], VESC_SCALE_STATUS_10_COMMUNICATIONSTATE);
+	_VESC_ReadRawData8u(out->controlMode, in, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_CONTROLMODE], VESC_SCALE_STATUS_10_CONTROLMODE);
 
 	return true;
 }
