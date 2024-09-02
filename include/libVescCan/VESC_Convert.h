@@ -16,14 +16,14 @@
 #define _VESC_WriteRawData32u(rawf,off,in,scale) *( (uint32_t*)&rawf->rawData[off] ) = VESC_htobe32( (uint32_t)(in * ((float)scale)) )
 #define _VESC_WriteRawData64u(rawf,off,in,scale) *( (uint64_t*)&rawf->rawData[off] ) = VESC_htobe64( (uint64_t)(in * ((float)scale)) )
 
-#define _VESC_ReadRawData8(dst,rawf,off,scale) dst = *((int8_t*)&rawf->rawData[off]) / ((float)scale)
-#define _VESC_ReadRawData16(dst,rawf,off,scale) dst = VESC_be16toh(*((int16_t*)&rawf->rawData[off])) / ((float)scale)
-#define _VESC_ReadRawData32(dst,rawf,off,scale) dst = VESC_be32toh(*((int32_t*)&rawf->rawData[off])) / ((float)scale)
-#define _VESC_ReadRawData64(dst,rawf,off,scale) dst = VESC_be64toh(*((int64_t*)&rawf->rawData[off])) / ((float)scale)
-#define _VESC_ReadRawData8u(dst,rawf,off,scale) dst = *((uint8_t*)&rawf->rawData[off]) / ((float)scale)
-#define _VESC_ReadRawData16u(dst,rawf,off,scale) dst = VESC_be16toh(*((uint16_t*)&rawf->rawData[off])) / ((float)scale)
-#define _VESC_ReadRawData32u(dst,rawf,off,scale) dst = VESC_be32toh(*((uint32_t*)&rawf->rawData[off])) / ((float)scale)
-#define _VESC_ReadRawData64u(dst,rawf,off,scale) dst = VESC_be64toh(*((uint64_t*)&rawf->rawData[off])) / ((float)scale)
+#define _VESC_ReadRawData8(dst,rawf,off,scale,explicitType) dst = explicitType(*((int8_t*)&rawf->rawData[off]) / ((float)scale))
+#define _VESC_ReadRawData16(dst,rawf,off,scale,explicitType) dst = explicitType(VESC_be16toh(*((int16_t*)&rawf->rawData[off])) / ((float)scale))
+#define _VESC_ReadRawData32(dst,rawf,off,scale,explicitType) dst = explicitType(VESC_be32toh(*((int32_t*)&rawf->rawData[off])) / ((float)scale))
+#define _VESC_ReadRawData64(dst,rawf,off,scale,explicitType) dst = explicitType(VESC_be64toh(*((int64_t*)&rawf->rawData[off])) / ((float)scale))
+#define _VESC_ReadRawData8u(dst,rawf,off,scale,explicitType) dst = explicitType(*((uint8_t*)&rawf->rawData[off]) / ((float)scale))
+#define _VESC_ReadRawData16u(dst,rawf,off,scale,explicitType) dst = explicitType(VESC_be16toh(*((uint16_t*)&rawf->rawData[off])) / ((float)scale))
+#define _VESC_ReadRawData32u(dst,rawf,off,scale,explicitType) dst = explicitType(VESC_be32toh(*((uint32_t*)&rawf->rawData[off])) / ((float)scale))
+#define _VESC_ReadRawData64u(dst,rawf,off,scale,explicitType) dst = explicitType(VESC_be64toh(*((uint64_t*)&rawf->rawData[off])) / ((float)scale))
 
 //****
 // to VESC_RawFrame
