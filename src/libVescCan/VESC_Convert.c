@@ -143,10 +143,11 @@ bool VESC_convertStatus8ToRaw(VESC_RawFrame* out, const VESC_Status_8* in)
 	out->_reserved = VESC_CAN_EXTID_FLAG;
 	out->can_dlc = VESC_CAN_STATUS_8_DLEN;
 
-	_VESC_WriteRawData16(out, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_WEIGHT], in->weight, VESC_SCALE_STATUS_8_WEIGHT);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_WEIGHT_A], in->weightA, VESC_SCALE_STATUS_8_WEIGHT_A);
 	_VESC_WriteRawData16(out, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_DISTANCE], in->distance, VESC_SCALE_STATUS_8_DISTANCE);
 	_VESC_WriteRawData8u(out, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_HUMIDITY], in->humidity, VESC_SCALE_STATUS_8_HUMIDITY);
 	_VESC_WriteRawData8u(out, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_VIBRATIONS], in->vibrations, VESC_SCALE_NA);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_WEIGHT_B], in->weightB, VESC_SCALE_STATUS_8_WEIGHT_B);
 
 	return true;
 }
@@ -161,6 +162,7 @@ bool VESC_convertStatus9ToRaw(VESC_RawFrame* out, const VESC_Status_9* in)
 	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_POTASSIUM], in->potassium, VESC_SCALE_STATUS_9_POTASSIUM);
 	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_NITROGEN], in->nitrogen, VESC_SCALE_STATUS_9_NITROGEN);
 	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PHOSPHORUS], in->phosphorus, VESC_SCALE_STATUS_9_PHOSPHORUS);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PH], in->ph, VESC_SCALE_STATUS_9_PH);
 
 	return true;
 }
@@ -324,10 +326,11 @@ bool VESC_convertRawToStatus8(VESC_Status_8* out, const VESC_RawFrame* in)
 
 	out->vescID = in->vescID;
 
-	_VESC_ReadRawData16(out->weight, in, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_WEIGHT], VESC_SCALE_STATUS_8_WEIGHT,/*none*/);
+	_VESC_ReadRawData16(out->weightA, in, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_WEIGHT_A], VESC_SCALE_STATUS_8_WEIGHT_A,/*none*/);
 	_VESC_ReadRawData16(out->distance, in, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_DISTANCE], VESC_SCALE_STATUS_8_DISTANCE,/*none*/);
 	_VESC_ReadRawData8u(out->humidity, in, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_HUMIDITY], VESC_SCALE_STATUS_8_HUMIDITY,/*nope*/);
 	_VESC_ReadRawData8u(out->vibrations, in, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_VIBRATIONS], VESC_SCALE_STATUS_8_VIBRATIONS,/*nope*/);
+	_VESC_ReadRawData16(out->weightB, in, _VESC_offset_Status_8[_VESC_OFFSETIDX_STATUS_8_WEIGHT_B], VESC_SCALE_STATUS_8_WEIGHT_B,/*none*/);
 
 	return true;
 }
@@ -342,6 +345,7 @@ bool VESC_convertRawToStatus9(VESC_Status_9* out, const VESC_RawFrame* in)
 	_VESC_ReadRawData16(out->potassium, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_POTASSIUM], VESC_SCALE_STATUS_9_POTASSIUM,/*none*/);
 	_VESC_ReadRawData16(out->nitrogen, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_NITROGEN], VESC_SCALE_STATUS_9_NITROGEN,/*none*/);
 	_VESC_ReadRawData16(out->phosphorus, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PHOSPHORUS], VESC_SCALE_STATUS_9_PHOSPHORUS,/*none*/);
+	_VESC_ReadRawData16(out->ph, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PH], VESC_SCALE_STATUS_9_PH,/*none*/);
 
 	return true;
 }
