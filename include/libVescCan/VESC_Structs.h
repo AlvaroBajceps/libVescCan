@@ -151,6 +151,7 @@ typedef struct _VESC_Status_9
     float potassium;
     float nitrogen;
     float phosphorus;
+	float ph;
 } VESC_Status_9;
 
 /// <summary>

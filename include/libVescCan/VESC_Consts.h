@@ -46,6 +46,7 @@ typedef int16_t VESC_Status_8_weightB_t;
 typedef int16_t VESC_Status_9_potassium_t;
 typedef int16_t VESC_Status_9_nitrogen_t;
 typedef int16_t VESC_Status_9_phosphorus_t;
+typedef int16_t VESC_Status_9_ph_t;
 
 typedef int8_t VESC_Status_10_flags_t;
 typedef int8_t VESC_Status_10_communicationState_t;
@@ -64,7 +65,7 @@ typedef int8_t VESC_Status_10_controlMode_t;
 #define VESC_CAN_STATUS_6_DLEN 8
 #define VESC_CAN_STATUS_7_DLEN 8
 #define VESC_CAN_STATUS_8_DLEN 8
-#define VESC_CAN_STATUS_9_DLEN 6
+#define VESC_CAN_STATUS_9_DLEN 8
 #define VESC_CAN_STATUS_10_DLEN 3
 
 
@@ -151,7 +152,8 @@ typedef enum VESC_Command_enum
 
 #define VESC_SCALE_STATUS_9_POTASSIUM 1
 #define VESC_SCALE_STATUS_9_NITROGEN 1
-#define VESC_SCALE_STATUS_9_PHOSPHORUS 100
+#define VESC_SCALE_STATUS_9_PHOSPHORUS 1
+#define VESC_SCALE_STATUS_9_PH 1
 
 #define VESC_SCALE_STATUS_10_FLAGS VESC_SCALE_NA
 #define VESC_SCALE_STATUS_10_COMMUNICATIONSTATE VESC_SCALE_NA
@@ -222,6 +224,7 @@ enum _VESC_offsetIdx_Status_9_enum
 	_VESC_OFFSETIDX_STATUS_9_POTASSIUM = 0,
 	_VESC_OFFSETIDX_STATUS_9_NITROGEN,
 	_VESC_OFFSETIDX_STATUS_9_PHOSPHORUS,
+	_VESC_OFFSETIDX_STATUS_9_PH
 };
 
 enum _VESC_offsetIdx_Status_10_enum
@@ -298,6 +301,7 @@ static const int _VESC_offset_Status_9[] =
     0,
 	sizeof(VESC_Status_9_potassium_t),
 	sizeof(VESC_Status_9_potassium_t) + sizeof(VESC_Status_9_nitrogen_t),
+	sizeof(VESC_Status_9_potassium_t) + sizeof(VESC_Status_9_nitrogen_t) + sizeof(VESC_Status_9_phosphorus_t)
 };
 
 static const int _VESC_offset_Status_10[] =

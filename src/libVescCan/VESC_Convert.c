@@ -162,6 +162,7 @@ bool VESC_convertStatus9ToRaw(VESC_RawFrame* out, const VESC_Status_9* in)
 	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_POTASSIUM], in->potassium, VESC_SCALE_STATUS_9_POTASSIUM);
 	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_NITROGEN], in->nitrogen, VESC_SCALE_STATUS_9_NITROGEN);
 	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PHOSPHORUS], in->phosphorus, VESC_SCALE_STATUS_9_PHOSPHORUS);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PH], in->ph, VESC_SCALE_STATUS_9_PH);
 
 	return true;
 }
@@ -344,6 +345,7 @@ bool VESC_convertRawToStatus9(VESC_Status_9* out, const VESC_RawFrame* in)
 	_VESC_ReadRawData16(out->potassium, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_POTASSIUM], VESC_SCALE_STATUS_9_POTASSIUM,/*none*/);
 	_VESC_ReadRawData16(out->nitrogen, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_NITROGEN], VESC_SCALE_STATUS_9_NITROGEN,/*none*/);
 	_VESC_ReadRawData16(out->phosphorus, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PHOSPHORUS], VESC_SCALE_STATUS_9_PHOSPHORUS,/*none*/);
+	_VESC_ReadRawData16(out->ph, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PH], VESC_SCALE_STATUS_9_PH,/*none*/);
 
 	return true;
 }
