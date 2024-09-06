@@ -170,20 +170,19 @@ The content of the status messages is encoded as follows:
 
 | **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
 |------|------|------|-------|---------|
-| B0 - B1 | Weight | grams | 10| Probe |
+| B0 - B1 | WeightA | grams | 10 | Probe |
 | B2 - B3 | Distance | cm | 10 | Probe |
 | B4 | Humidity | % | 2 | Probe |
 | B5 | Vibrations | 1-bit FLAG | N/A | Probe |
-| B6 - B7 | Unused | | | |
-
+| B6 - B7 | WeightB | grams | 10 | Probe |
 #### **VESC_COMMAND_STATUS_9**
 
 | **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
 |------|------|------|-------|---------|
 | B0 - B1 | Potassium | mg/kg | 1 | Probe |
 | B2 - B3 | Nitrogen  | mg/kg | 1 | Probe |
-| B4 - B5 | Phosphorus | mg/kg | 100 | Probe |
-| B6 - B7 | Unused | | | |
+| B4 - B5 | Phosphorus | mg/kg | 1 | Probe |
+| B6 - B7 | Ph | ph | 1 | Probe |
 
 #### **VESC_COMMAND_STATUS_10**
 > Note:  
