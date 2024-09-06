@@ -37,10 +37,11 @@ typedef int16_t VESC_Status_6_ppm_t;
 
 typedef int64_t VESC_Status_7_precisePos_t;
 
-typedef int16_t VESC_Status_8_weight_t;
+typedef int16_t VESC_Status_8_weightA_t;
 typedef int16_t VESC_Status_8_distance_t;
 typedef int8_t VESC_Status_8_humidity_t;
 typedef int8_t VESC_Status_8_vibrations_t;
+typedef int16_t VESC_Status_8_weightB_t;
 
 typedef int16_t VESC_Status_9_potassium_t;
 typedef int16_t VESC_Status_9_nitrogen_t;
@@ -62,7 +63,7 @@ typedef int8_t VESC_Status_10_controlMode_t;
 #define VESC_CAN_STATUS_5_DLEN 6 // hello there
 #define VESC_CAN_STATUS_6_DLEN 8
 #define VESC_CAN_STATUS_7_DLEN 8
-#define VESC_CAN_STATUS_8_DLEN 6
+#define VESC_CAN_STATUS_8_DLEN 8
 #define VESC_CAN_STATUS_9_DLEN 6
 #define VESC_CAN_STATUS_10_DLEN 3
 
@@ -142,10 +143,11 @@ typedef enum VESC_Command_enum
 
 #define VESC_SCALE_STATUS_7_PRECISEPOS 1000000
 
-#define VESC_SCALE_STATUS_8_WEIGHT 10
+#define VESC_SCALE_STATUS_8_WEIGHT_A 10
 #define VESC_SCALE_STATUS_8_DISTANCE 10
 #define VESC_SCALE_STATUS_8_HUMIDITY 2
 #define VESC_SCALE_STATUS_8_VIBRATIONS VESC_SCALE_NA
+#define VESC_SCALE_STATUS_8_WEIGHT_B 10
 
 #define VESC_SCALE_STATUS_9_POTASSIUM 1
 #define VESC_SCALE_STATUS_9_NITROGEN 1
@@ -208,10 +210,11 @@ enum _VESC_offsetIdx_Status_7_enum
 
 enum _VESC_offsetIdx_Status_8_enum
 {
-	_VESC_OFFSETIDX_STATUS_8_WEIGHT = 0,
+	_VESC_OFFSETIDX_STATUS_8_WEIGHT_A = 0,
 	_VESC_OFFSETIDX_STATUS_8_DISTANCE,
 	_VESC_OFFSETIDX_STATUS_8_HUMIDITY,
 	_VESC_OFFSETIDX_STATUS_8_VIBRATIONS,
+	_VESC_OFFSETIDX_STATUS_8_WEIGHT_B
 };
 
 enum _VESC_offsetIdx_Status_9_enum
@@ -284,9 +287,10 @@ static const int _VESC_offset_Status_7[] =
 static const int _VESC_offset_Status_8[] =
 {
     0,
-	sizeof(VESC_Status_8_weight_t),
-	sizeof(VESC_Status_8_weight_t) + sizeof(VESC_Status_8_distance_t),
-	sizeof(VESC_Status_8_weight_t) + sizeof(VESC_Status_8_distance_t) + sizeof(VESC_Status_8_humidity_t),
+	sizeof(VESC_Status_8_weightA_t),
+	sizeof(VESC_Status_8_weightA_t) + sizeof(VESC_Status_8_distance_t),
+	sizeof(VESC_Status_8_weightA_t) + sizeof(VESC_Status_8_distance_t) + sizeof(VESC_Status_8_humidity_t),
+	sizeof(VESC_Status_8_weightA_t) + sizeof(VESC_Status_8_distance_t) + sizeof(VESC_Status_8_humidity_t) + sizeof(VESC_Status_8_vibrations_t),
 };
 
 static const int _VESC_offset_Status_9[] =

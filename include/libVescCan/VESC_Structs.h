@@ -134,10 +134,11 @@ typedef struct _VESC_Status_7
 typedef struct _VESC_Status_8
 {
     VESC_Id_t vescID;
-    float weight;
+    float weightA;
     float distance;
     float humidity;
 	bool vibrations;
+	float weightB;
 } VESC_Status_8;
 
 /// <summary>
