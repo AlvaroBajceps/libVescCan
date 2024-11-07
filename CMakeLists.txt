@@ -22,7 +22,7 @@ target_include_directories(libVescCan PUBLIC
 
 # install lib
 install(TARGETS libVescCan
-	EXPORT libVescCanTargets
+	EXPORT libVescCan
 	ARCHIVE DESTINATION lib
 )
 
@@ -32,8 +32,8 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
 )
 
 # Export the target to a CMake configuration file
-install(EXPORT libVescCanTargets
-    FILE libVescCanTargets.cmake
+install(EXPORT libVescCan
+    FILE libVescCanConfig.cmake
     NAMESPACE libVescCan::
     DESTINATION lib/cmake/libVescCan
 )
