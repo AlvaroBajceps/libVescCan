@@ -37,14 +37,36 @@ typedef struct _VESC_RawFrame
 
 /// <summary>
 /// Frame for commanding.
+/// For commands 0-4 and 10-13 use `commandData`.
+/// For command 5 use `commandDataExB`.
+/// For command 6 use `commandDataEx_0`, `commandDataEx_1` and `commandDataEx_2`.
 /// Convert to VESC_RawFrame before sending!
 /// </summary>
 typedef struct _VESC_CommandFrame
 {
     VESC_Id_t vescID;
     VESC_Command_t command;
-    float commandData;
+    union {
+        //For commands 0-4 and 10-13
+        float commandData;
+
+		//For command 5
+		uint8_t commandDataExB;
+
+        //For command 6
+        struct {
+			//For command 6 position
+            float commandDataEx_0;
+			//For command 6 speed
+            float commandDataEx_1;
+            //For command 6 acceleration
+			float commandDataEx_2;
+        };
+
+		uint8_t _commandDataRaw[12];
+	};
 } VESC_CommandFrame;
+
 
 /// <summary>
 /// Status 1 frame

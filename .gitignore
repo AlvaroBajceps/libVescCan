@@ -3,3 +3,6 @@ build/
 
 # ignore vscode dir
 .vscode/
+
+#clangd
+.cache/

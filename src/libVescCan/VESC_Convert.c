@@ -1,3 +1,4 @@
+#include "libVescCan/VESC_Consts.h"
 #include <libVescCan/VESC_Convert.h>
 
 bool VESC_convertCmdToRaw(VESC_RawFrame* out, const VESC_CommandFrame* in)
@@ -19,6 +20,14 @@ bool VESC_convertCmdToRaw(VESC_RawFrame* out, const VESC_CommandFrame* in)
 	case VESC_COMMAND_SET_POS:
 		_VESC_WriteRawData32(out, _VESC_OFFSET_COMMANDFRAME, in->commandData, VESC_SCALE_SET_POS);
 		break;
+	case VESC_COMMAND_SET_ORIGIN:
+		_VESC_WriteRawData8u(out, _VESC_OFFSET_COMMANDFRAME, in->commandDataExB, VESC_SCALE_NA);
+		break;
+	case VESC_COMMAND_SET_POS_SPEED_LOOP:
+		_VESC_WriteRawData32(out, _VESC_offset_PosSpeedLoop[_VESC_OFFSETIDX_POS_SPEED_LOOP_POSITION], in->commandDataEx_0, VESC_SCALE_SET_POS_SPEED_LOOP_POSITION);
+		_VESC_WriteRawData16(out, _VESC_offset_PosSpeedLoop[_VESC_OFFSETIDX_POS_SPEED_LOOP_SPEED], in->commandDataEx_1, VESC_SCALE_SET_POS_SPEED_LOOP_SPEED);
+		_VESC_WriteRawData16u(out, _VESC_offset_PosSpeedLoop[_VESC_OFFSETIDX_POS_SPEED_LOOP_ACCELERATION], in->commandDataEx_2, VESC_SCALE_SET_POS_SPEED_LOOP_ACCELERATION);
+		break;
 	case VESC_COMMAND_SET_CURRENT_REL:
 		_VESC_WriteRawData32(out, _VESC_OFFSET_COMMANDFRAME, in->commandData, VESC_SCALE_SET_CURRENT_REL);
 		break;
@@ -37,7 +46,14 @@ bool VESC_convertCmdToRaw(VESC_RawFrame* out, const VESC_CommandFrame* in)
 	out->vescID = in->vescID;
 	out->command = in->command;
 	out->_reserved = VESC_CAN_EXTID_FLAG;
-	out->can_dlc = (int8_t)sizeof(VESC_CommandData_t);
+
+	if(in->command == VESC_COMMAND_SET_ORIGIN)
+		out->can_dlc = 1;
+	else if(in->command == VESC_COMMAND_SET_POS_SPEED_LOOP)
+		out->can_dlc = 8;
+	else
+		out->can_dlc = 4;
+
 	return true;
 }
 
@@ -201,6 +217,14 @@ bool VESC_convertRawToCmd(VESC_CommandFrame* out, const VESC_RawFrame* in)
 		break;
 	case VESC_COMMAND_SET_POS:
 		_VESC_ReadRawData32(out->commandData, in, _VESC_OFFSET_COMMANDFRAME, VESC_SCALE_SET_POS,/*none*/);
+		break;
+	case VESC_COMMAND_SET_ORIGIN:
+		_VESC_ReadRawData8u(out->commandDataExB, in, _VESC_OFFSET_COMMANDFRAME, VESC_SCALE_NA, /*none*/);
+		break;
+	case VESC_COMMAND_SET_POS_SPEED_LOOP:
+		_VESC_ReadRawData32(out->commandDataEx_0, in, _VESC_offset_PosSpeedLoop[_VESC_OFFSETIDX_POS_SPEED_LOOP_POSITION], VESC_SCALE_SET_POS_SPEED_LOOP_POSITION, /*none*/);
+		_VESC_ReadRawData16(out->commandDataEx_1, in, _VESC_offset_PosSpeedLoop[_VESC_OFFSETIDX_POS_SPEED_LOOP_SPEED], VESC_SCALE_SET_POS_SPEED_LOOP_SPEED, /*none*/);
+		_VESC_ReadRawData16u(out->commandDataEx_2, in, _VESC_offset_PosSpeedLoop[_VESC_OFFSETIDX_POS_SPEED_LOOP_ACCELERATION], VESC_SCALE_SET_POS_SPEED_LOOP_ACCELERATION, /*none*/);
 		break;
 	case VESC_COMMAND_SET_CURRENT_REL:
 		_VESC_ReadRawData32(out->commandData, in, _VESC_OFFSET_COMMANDFRAME, VESC_SCALE_SET_CURRENT_REL,/*none*/);
