@@ -1,5 +1,7 @@
 # VESC CAN-Bus Communication
 
+> Frames SetOrigin and SetPosSpeedLoop aren't yet documented. See [cubemars manual](https://www.cubemars.com/images/file/20240611/1718085712815162.pdf) section 5.1.6 and 5.1.7
+
 Modified for our ([Raptors PŁ](https://raptors.p.lodz.pl/)) needs  
 Original document can be found [here](https://github.com/vedderb/bldc/blob/master/documentation/comm_can.md).  
 
