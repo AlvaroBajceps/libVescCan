@@ -147,7 +147,11 @@ bool VESC_convertStatus7ToRaw(VESC_RawFrame* out, const VESC_Status_7* in)
 	out->_reserved = VESC_CAN_EXTID_FLAG;
 	out->can_dlc = VESC_CAN_STATUS_7_DLEN;
 
-	_VESC_WriteRawData64(out, _VESC_offset_Status_7[_VESC_OFFSETIDX_STATUS_7_PRECISEPOS], in->precisePos, VESC_SCALE_STATUS_7_PRECISEPOS);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_7[_VESC_OFFSETIDX_STATUS_7_POSITION], in->position, VESC_SCALE_STATUS_7_POSITION);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_7[_VESC_OFFSETIDX_STATUS_7_SPEED], in->speed, VESC_SCALE_STATUS_7_SPEED);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_7[_VESC_OFFSETIDX_STATUS_7_CURRENT], in->current, VESC_SCALE_STATUS_7_CURRENT);
+	_VESC_WriteRawData8(out, _VESC_offset_Status_7[_VESC_OFFSETIDX_STATUS_7_MOTORTEMP], in->motorTemp, VESC_SCALE_STATUS_7_MOTORTEMP);
+	_VESC_WriteRawData8u(out, _VESC_offset_Status_7[_VESC_OFFSETIDX_STATUS_7_ERRORCODE], in->errorCode, VESC_SCALE_STATUS_7_ERRORCODE);
 
 	return true;
 }
@@ -338,7 +342,11 @@ bool VESC_convertRawToStatus7(VESC_Status_7* out, const VESC_RawFrame* in)
 
 	out->vescID = in->vescID;
 
-	_VESC_ReadRawData64(out->precisePos, in, _VESC_offset_Status_7[_VESC_OFFSETIDX_STATUS_7_PRECISEPOS], VESC_SCALE_STATUS_7_PRECISEPOS,/*none*/);
+	_VESC_ReadRawData16(out->position, in, _VESC_offset_Status_7[_VESC_OFFSETIDX_STATUS_7_POSITION], VESC_SCALE_STATUS_7_POSITION,/*none*/);
+	_VESC_ReadRawData16(out->speed, in, _VESC_offset_Status_7[_VESC_OFFSETIDX_STATUS_7_SPEED], VESC_SCALE_STATUS_7_SPEED,/*none*/);
+	_VESC_ReadRawData16(out->current, in, _VESC_offset_Status_7[_VESC_OFFSETIDX_STATUS_7_CURRENT], VESC_SCALE_STATUS_7_CURRENT,/*none*/);
+	_VESC_ReadRawData8(out->motorTemp, in, _VESC_offset_Status_7[_VESC_OFFSETIDX_STATUS_7_MOTORTEMP], VESC_SCALE_STATUS_7_MOTORTEMP,/*none*/);
+	_VESC_ReadRawData8u(out->errorCode, in, _VESC_offset_Status_7[_VESC_OFFSETIDX_STATUS_7_ERRORCODE], VESC_SCALE_STATUS_7_ERRORCODE, (VESC_Status_7_ErrorCode));
 
 	return true;
 }
