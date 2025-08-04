@@ -1,9 +1,8 @@
 # VESC CAN-Bus Communication
 
-> Frames SetOrigin and SetPosSpeedLoop aren't yet documented. See [cubemars manual](https://www.cubemars.com/images/file/20240611/1718085712815162.pdf) section 5.1.6 and 5.1.7
-
 Modified for our ([Raptors PŁ](https://raptors.p.lodz.pl/)) needs  
 Original document can be found [here](https://github.com/vedderb/bldc/blob/master/documentation/comm_can.md).  
+Original document regarding Cubemars - [cubemars manual](https://www.cubemars.com/images/file/20240611/1718085712815162.pdf) 
 
 ## Timeout
 
@@ -86,15 +85,29 @@ The following simple commands are available:
 
 | **Command Name** | **Comm ID** | **Scaling** | **Unit** | **Description** | **Range** | **Availability** |
 |------------|------------|---------|------|-------------|-------|--|
-| VESC_COMMAND_SET_DUTY | 0 | 100000 | % / 100 | Duty Cycle | \-1.0 to 1.0 | BLDC |
-| VESC_COMMAND_SET_CURRENT | 1 | 1000 | A | Motor Current | \-MOTOR_MAX to MOTOR_MAX | BLDC |
-| VESC_COMMAND_SET_CURRENT_BRAKE | 2 | 1000 | A | Braking Current | \-MOTOR_MAX to MOTOR_MAX | BLDC |
-| VESC_COMMAND_SET_RPM | 3 | 1 | RPM | RPM | \-MAX_RPM to MAX_RPM | BLDC |
-| VESC_COMMAND_SET_POS | 4 | 1000000 | Degrees |  | 0 to 360 | BLDC & Steppers |
+| VESC_COMMAND_SET_DUTY | 0 | 100000 | % / 100 | Duty Cycle | \-1.0 to 1.0 | BLDC, Cubemars |
+| VESC_COMMAND_SET_CURRENT | 1 | 1000 | A | Motor Current | \-MOTOR_MAX to MOTOR_MAX | BLDC, Cubemars |
+| VESC_COMMAND_SET_CURRENT_BRAKE | 2 | 1000 | A | Braking Current | \-MOTOR_MAX to MOTOR_MAX | BLDC, Cubemars |
+| VESC_COMMAND_SET_RPM | 3 | 1 | RPM | RPM | \-MAX_RPM to MAX_RPM | BLDC, Cubemars |
+| VESC_COMMAND_SET_POS | 4 | 1000000 | Degrees |  | 0 to 360 | BLDC, Cubemars* & ~~Steppers~~ |
+| VESC_COMMAND_SET_ORIGIN | 5 | N/A | `VESC_SetOrigin_Command` | Uses `commandDataExB` | N/A | Cubemars |
+| VESC_COMMAND_SET_POS_SPEED_LOOP | 6 | N/A | N/A | Uses `commandDataEx_{0,1,2}` | N/A | Cubemars |
 | VESC_COMMAND_SET_CURRENT_REL | 10 | 100000 | % / 100 |  | \-1.0 to 1.0 | BLDC |
 | VESC_COMMAND_SET_CURRENT_BRAKE_REL | 11 | 100000 | % / 100 |  | \-1.0 to 1.0 | BLDC |
 | VESC_COMMAND_SET_CURRENT_HANDBRAKE | 12 | 1000 | A |  | \-MOTOR_MAX to MOTOR_MAX | BLDC |
 | VESC_COMMAND_SET_CURRENT_HANDBRAKE_REL | 13 | 100000 | % / 100 |  | \-1.0 to 1.0 | BLDC |
+
+> \* VESC_COMMAND_SET_POS for Cubemars is supported but not scaled correctly. Apply 1/100 of value to Cubemars. (Details in #10)
+
+#### **VESC_COMMAND_SET_POS_SPEED_LOOP**
+
+Well, this one isn't that simple..
+
+| **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
+|------|------|------|-------|---------|
+| B0 - B3 | Position | Deg | 10000 | Cubemars |
+| B4 - B5 | Speed | ERPM | 0.1 | Cubemars |
+| B6 - B7 | Acceleration | ERPM/s² | 0.1 | Cubemars |
 
 ### Status Frames
 
@@ -111,16 +124,17 @@ There are 10 different status messages available with the following data:
 
 | **Command Name** | **Command Id** | **Content** | **Availability** |
 |--------------|------------|---------|---------|
-| VESC_COMMAND_STATUS_1 | 9 | ERPM, Current | BLDC & Stepper |
+| VESC_COMMAND_STATUS_1 | 9 | ERPM, Current | BLDC & ~~Stepper~~ |
 | VESC_COMMAND_STATUS_2 | 14 | Ah Used, Ah Charged | BLDC |
 | VESC_COMMAND_STATUS_3 | 15 | Wh Used, Wh Charged | BLDC |
 | VESC_COMMAND_STATUS_4 | 16 | Temp Fet, Temp Motor, Current In, PID position | BLDC |
 | VESC_COMMAND_STATUS_5 | 27 | Tachometer, Voltage In | BLDC |
 | VESC_COMMAND_STATUS_6 | 28 | ADC1, ADC2, ADC3, PPM | BLDC |
-| VESC_COMMAND_STATUS_7 | 29 | Precise Position | Stepper |
+| VESC_COMMAND_STATUS_7 | 29 | Precise Position | ~~Stepper~~ |
 | VESC_COMMAND_STATUS_8 | 30 | Weight, Distance, Humidity, Vibrations | Probe |
 | VESC_COMMAND_STATUS_9 | 31 | Potassium, Nitrogen, Phosphorus | Probe |
-| VESC_COMMAND_STATUS_10 | 32 | MCU States | ROS (NUC) |
+| VESC_COMMAND_STATUS_10 | 32 | MCU States | ROS (ros-core) |
+| VESC_COMMAND_STATUS_11 | 41 | Cubemars status | Cubemars |
 
 The content of the status messages is encoded as follows:
 
@@ -128,7 +142,7 @@ The content of the status messages is encoded as follows:
 
 | **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
 |------|------|------|-------|---------|
-| B0 - B3 | ERPM | RPM | 1 | BLDC & Stepper |
+| B0 - B3 | ERPM | RPM | 1 | BLDC & ~~Stepper~~ |
 | B4 - B5 | Current | A | 10 | BLDC & ~~Stepper~~ |
 | B6 - B7 | Duty Cycle | % / 100 | 1000 | BLDC |
 
@@ -166,7 +180,7 @@ The content of the status messages is encoded as follows:
 
 | **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
 |------|------|------|-------|---------|
-| B0 - B3 | PrecisePos | Deg | 1000000 | Stepper |
+| B0 - B3 | PrecisePos | Deg | 1000000 | ~~Stepper~~ |
 
 #### **VESC_COMMAND_STATUS_8**
 
@@ -193,9 +207,18 @@ The content of the status messages is encoded as follows:
 | **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
 |------|------|------|-------|---------|
 | B0 | Flags: <br/><ul><li>b0 -> Pad Connected</li><li>b1 -> Motor Cut-Off button</li></ul> | N/A | N/A | ROS |
-| B1 | Communication State | ENUM | N/A | ROS |
-| B2 | Control Mode   | ENUM | N/A | ROS |
-| B3 - B7 | Unused | | | |
+| B1 | Communication State | `VESC_Status_10_CommunicationState` | N/A | ROS |
+| B2 | Control Mode   | `VESC_Status_10_ControlMode` | N/A | ROS |
+
+#### **VESC_COMMAND_STATUS_11**
+
+| **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
+|------|------|------|-------|---------|
+| B0 - B1 | Position | Deg | 10 | Cubemars |
+| B2 - B3 | Speed | ERPM | 0.1 | Cubemars |
+| B4 - B5 | Current | A | 100 | Cubemars |
+| B6 | Motor Temp | DegC | 1 | Cubemars |
+| B7 | Error Code | `VESC_Status_11_ErrorCode` | N/A | Cubemars |
 
 ## Frequently Asked Questions (FAQ)
 
