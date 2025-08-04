@@ -140,18 +140,13 @@ typedef struct _VESC_Status_6
 } VESC_Status_6;
 
 /// <summary>
-/// Status 7 frame (note: cubemars frame)
+/// Status 7 frame (note: not standard frame)
 /// Convert to VESC_RawFrame before sending!
 /// </summary>
 typedef struct _VESC_Status_7
 {
     VESC_Id_t vescID;
-    float position;
-    float speed;
-    float current;
-    float motorTemp;
-    VESC_Status_7_ErrorCode errorCode;
-
+    float precisePos;
 } VESC_Status_7;
 
 /// <summary>

@@ -40,11 +40,7 @@ typedef int16_t VESC_Status_6_adc2_t;
 typedef int16_t VESC_Status_6_adc3_t;
 typedef int16_t VESC_Status_6_ppm_t;
 
-typedef int16_t VESC_Status_7_position_t;
-typedef int16_t VESC_Status_7_speed_t;
-typedef int16_t VESC_Status_7_current_t;
-typedef int8_t VESC_Status_7_motorTemp_t;
-typedef int8_t VESC_Status_7_errorCode_t;
+typedef int64_t VESC_Status_7_precisePos_t;
 
 typedef int16_t VESC_Status_8_weightA_t;
 typedef int16_t VESC_Status_8_distance_t;
@@ -119,19 +115,6 @@ typedef enum VESC_SetOrigin_Command_Enum
 	VESC_SETORIGIN_COMMAND_PERMANENT = 1,
 } VESC_SetOrigin_Command;
 
-typedef enum VESC_Status_7_ErrorCode_Enum
-{
-	VESC_STATUS_7_ERRORCODE_OK = 0,
-	VESC_STATUS_7_ERRORCODE_OVERTEMP = 1,
-	VESC_STATUS_7_ERRORCODE_OVERCURRENT = 2,
-	VESC_STATUS_7_ERRORCODE_OVERVOLTAGE = 3,
-	VESC_STATUS_7_ERRORCODE_UNDERVOLTAGE = 4,
-	VESC_STATUS_7_ERRORCODE_ENCODERFAULT = 5,
-	VESC_STATUS_7_ERRORCODE_MOSFET_OVERTEMP = 6,
-	VESC_STATUS_7_ERRORCODE_STALL = 7,
-
-} VESC_Status_7_ErrorCode;
-
 
 //****
 // VESC scales
@@ -175,11 +158,7 @@ typedef enum VESC_Status_7_ErrorCode_Enum
 #define VESC_SCALE_STATUS_6_ADC3 1000
 #define VESC_SCALE_STATUS_6_PPM 1000
 
-#define VESC_SCALE_STATUS_7_POSITION 10
-#define VESC_SCALE_STATUS_7_SPEED 0.1
-#define VESC_SCALE_STATUS_7_CURRENT 100
-#define VESC_SCALE_STATUS_7_MOTORTEMP 1
-#define VESC_SCALE_STATUS_7_ERRORCODE VESC_SCALE_NA
+#define VESC_SCALE_STATUS_7_PRECISEPOS 1000000
 
 #define VESC_SCALE_STATUS_8_WEIGHT_A 10
 #define VESC_SCALE_STATUS_8_DISTANCE 10
@@ -251,11 +230,7 @@ enum _VESC_offsetIdx_Status_6_enum
 
 enum _VESC_offsetIdx_Status_7_enum
 {
-    _VESC_OFFSETIDX_STATUS_7_POSITION = 0,
-    _VESC_OFFSETIDX_STATUS_7_SPEED,
-    _VESC_OFFSETIDX_STATUS_7_CURRENT,
-    _VESC_OFFSETIDX_STATUS_7_MOTORTEMP,
-    _VESC_OFFSETIDX_STATUS_7_ERRORCODE,
+    _VESC_OFFSETIDX_STATUS_7_PRECISEPOS = 0
 };
 
 enum _VESC_offsetIdx_Status_8_enum
@@ -339,11 +314,7 @@ static const int _VESC_offset_Status_6[] =
 
 static const int _VESC_offset_Status_7[] =
 {
-    0,
-	sizeof(VESC_Status_7_position_t),
-	sizeof(VESC_Status_7_position_t) + sizeof(VESC_Status_7_speed_t),
-	sizeof(VESC_Status_7_position_t) + sizeof(VESC_Status_7_speed_t) + sizeof(VESC_Status_7_current_t),
-	sizeof(VESC_Status_7_position_t) + sizeof(VESC_Status_7_speed_t) + sizeof(VESC_Status_7_current_t) + sizeof(VESC_Status_7_motorTemp_t),
+    0
 };
 
 static const int _VESC_offset_Status_8[] =
