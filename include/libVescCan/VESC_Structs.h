@@ -4,6 +4,7 @@
 #include <libVescCan/VESC_Defines.h>
 #include <libVescCan/VESC_Consts.h>
 #include <libVescCan/VESC_Status_10_Consts.h>
+#include <libVescCan/VESC_Status_11_Consts.h>
 
 //****
 // structs
@@ -188,5 +189,20 @@ typedef struct _VESC_Status_10
     VESC_Status_10_CommunicationState communicationState;
 	VESC_Status_10_ControlMode controlMode;
 } VESC_Status_10;
+
+/// <summary>
+/// Status 11 frame (note: cubemars frame)
+/// Convert to VESC_RawFrame before sending!
+/// </summary>
+typedef struct _VESC_Status_11
+{
+    VESC_Id_t vescID;
+    float position;
+    float speed;
+    float current;
+    float motorTemp;
+    VESC_Status_11_ErrorCode errorCode;
+
+} VESC_Status_11;
 
 #endif //VESC_Structs_h_
