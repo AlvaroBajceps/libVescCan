@@ -57,6 +57,12 @@ typedef int8_t VESC_Status_10_flags_t;
 typedef int8_t VESC_Status_10_communicationState_t;
 typedef int8_t VESC_Status_10_controlMode_t;
 
+typedef int16_t VESC_Status_11_position_t;
+typedef int16_t VESC_Status_11_speed_t;
+typedef int16_t VESC_Status_11_current_t;
+typedef int8_t VESC_Status_11_motorTemp_t;
+typedef int8_t VESC_Status_11_errorCode_t;
+
 
 //****
 // dlen
@@ -72,6 +78,7 @@ typedef int8_t VESC_Status_10_controlMode_t;
 #define VESC_CAN_STATUS_8_DLEN 8
 #define VESC_CAN_STATUS_9_DLEN 8
 #define VESC_CAN_STATUS_10_DLEN 3
+#define VESC_CAN_STATUS_11_DLEN 8
 
 
 //****
@@ -106,7 +113,9 @@ typedef enum VESC_Command_enum
     VESC_COMMAND_STATUS_7 = 29,
     VESC_COMMAND_STATUS_8 = 30,
     VESC_COMMAND_STATUS_9 = 31,
-	VESC_COMMAND_STATUS_10 = 32
+	VESC_COMMAND_STATUS_10 = 32,
+	// cubemars
+	VESC_COMMAND_STATUS_11 = 41,
 } VESC_Command;
 
 typedef enum VESC_SetOrigin_Command_Enum
@@ -175,6 +184,11 @@ typedef enum VESC_SetOrigin_Command_Enum
 #define VESC_SCALE_STATUS_10_COMMUNICATIONSTATE VESC_SCALE_NA
 #define VESC_SCALE_STATUS_10_CONTROLMODE VESC_SCALE_NA
 
+#define VESC_SCALE_STATUS_11_POSITION 10
+#define VESC_SCALE_STATUS_11_SPEED 0.1
+#define VESC_SCALE_STATUS_11_CURRENT 100
+#define VESC_SCALE_STATUS_11_MOTORTEMP 1
+#define VESC_SCALE_STATUS_11_ERRORCODE VESC_SCALE_NA
 
 //****
 // enum for offsets
@@ -255,6 +269,15 @@ enum _VESC_offsetIdx_Status_10_enum
 	_VESC_OFFSETIDX_STATUS_10_FLAGS = 0,
 	_VESC_OFFSETIDX_STATUS_10_COMMUNICATIONSTATE,
 	_VESC_OFFSETIDX_STATUS_10_CONTROLMODE
+};
+
+enum _VESC_offsetIdx_Status_11_enum
+{
+    _VESC_OFFSETIDX_STATUS_11_POSITION = 0,
+    _VESC_OFFSETIDX_STATUS_11_SPEED,
+    _VESC_OFFSETIDX_STATUS_11_CURRENT,
+    _VESC_OFFSETIDX_STATUS_11_MOTORTEMP,
+    _VESC_OFFSETIDX_STATUS_11_ERRORCODE,
 };
 
 
@@ -339,6 +362,15 @@ static const int _VESC_offset_Status_10[] =
     0,
 	sizeof(VESC_Status_10_flags_t),
 	sizeof(VESC_Status_10_flags_t) + sizeof(VESC_Status_10_communicationState_t)
+};
+
+static const int _VESC_offset_Status_11[] =
+{
+    0,
+	sizeof(VESC_Status_11_position_t),
+	sizeof(VESC_Status_11_position_t) + sizeof(VESC_Status_11_speed_t),
+	sizeof(VESC_Status_11_position_t) + sizeof(VESC_Status_11_speed_t) + sizeof(VESC_Status_11_current_t),
+	sizeof(VESC_Status_11_position_t) + sizeof(VESC_Status_11_speed_t) + sizeof(VESC_Status_11_current_t) + sizeof(VESC_Status_11_motorTemp_t),
 };
 
 #endif // VESC_Consts_h_

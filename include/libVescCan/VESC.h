@@ -3,3 +3,4 @@
 #include <libVescCan/VESC_Structs.h>
 #include <libVescCan/VESC_Convert.h>
 #include <libVescCan/VESC_Status_10_Consts.h>
+#include <libVescCan/VESC_Status_11_Consts.h>

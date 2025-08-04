@@ -197,6 +197,22 @@ bool VESC_convertStatus10ToRaw(VESC_RawFrame* out, const VESC_Status_10* in)
 	return true;
 }
 
+bool VESC_convertStatus11ToRaw(VESC_RawFrame* out, const VESC_Status_11* in)
+{
+	out->vescID = in->vescID;
+	out->command = VESC_COMMAND_STATUS_11;
+	out->_reserved = VESC_CAN_EXTID_FLAG;
+	out->can_dlc = VESC_CAN_STATUS_11_DLEN;
+
+	_VESC_WriteRawData16(out, _VESC_offset_Status_11[_VESC_OFFSETIDX_STATUS_11_POSITION], in->position, VESC_SCALE_STATUS_11_POSITION);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_11[_VESC_OFFSETIDX_STATUS_11_SPEED], in->speed, VESC_SCALE_STATUS_11_SPEED);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_11[_VESC_OFFSETIDX_STATUS_11_CURRENT], in->current, VESC_SCALE_STATUS_11_CURRENT);
+	_VESC_WriteRawData8(out, _VESC_offset_Status_11[_VESC_OFFSETIDX_STATUS_11_MOTORTEMP], in->motorTemp, VESC_SCALE_STATUS_11_MOTORTEMP);
+	_VESC_WriteRawData8u(out, _VESC_offset_Status_11[_VESC_OFFSETIDX_STATUS_11_ERRORCODE], in->errorCode, VESC_SCALE_STATUS_11_ERRORCODE);
+
+	return true;
+}
+
 
 
 bool VESC_convertRawToCmd(VESC_CommandFrame* out, const VESC_RawFrame* in)
@@ -384,6 +400,22 @@ bool VESC_convertRawToStatus10(VESC_Status_10* out, const VESC_RawFrame* in)
 	_VESC_ReadRawData8u(out->flags, in, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_FLAGS], VESC_SCALE_STATUS_10_FLAGS,/*nope*/);
 	_VESC_ReadRawData8u(out->communicationState, in, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_COMMUNICATIONSTATE], VESC_SCALE_STATUS_10_COMMUNICATIONSTATE,(VESC_Status_10_CommunicationState));
 	_VESC_ReadRawData8u(out->controlMode, in, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_CONTROLMODE], VESC_SCALE_STATUS_10_CONTROLMODE,(VESC_Status_10_ControlMode));
+
+	return true;
+}
+
+bool VESC_convertRawToStatus11(VESC_Status_11* out, const VESC_RawFrame* in)
+{
+	if (in->command != VESC_COMMAND_STATUS_11)
+		return false;
+
+	out->vescID = in->vescID;
+
+	_VESC_ReadRawData16(out->position, in, _VESC_offset_Status_11[_VESC_OFFSETIDX_STATUS_11_POSITION], VESC_SCALE_STATUS_11_POSITION,/*none*/);
+	_VESC_ReadRawData16(out->speed, in, _VESC_offset_Status_11[_VESC_OFFSETIDX_STATUS_11_SPEED], VESC_SCALE_STATUS_11_SPEED,/*none*/);
+	_VESC_ReadRawData16(out->current, in, _VESC_offset_Status_11[_VESC_OFFSETIDX_STATUS_11_CURRENT], VESC_SCALE_STATUS_11_CURRENT,/*none*/);
+	_VESC_ReadRawData8(out->motorTemp, in, _VESC_offset_Status_11[_VESC_OFFSETIDX_STATUS_11_MOTORTEMP], VESC_SCALE_STATUS_11_MOTORTEMP,/*none*/);
+	_VESC_ReadRawData8u(out->errorCode, in, _VESC_offset_Status_11[_VESC_OFFSETIDX_STATUS_11_ERRORCODE], VESC_SCALE_STATUS_11_ERRORCODE, (VESC_Status_11_ErrorCode));
 
 	return true;
 }
