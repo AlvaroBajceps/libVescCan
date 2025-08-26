@@ -89,7 +89,7 @@ The following simple commands are available:
 | VESC_COMMAND_SET_CURRENT | 1 | 1000 | A | Motor Current | \-MOTOR_MAX to MOTOR_MAX | BLDC, Cubemars |
 | VESC_COMMAND_SET_CURRENT_BRAKE | 2 | 1000 | A | Braking Current | \-MOTOR_MAX to MOTOR_MAX | BLDC, Cubemars |
 | VESC_COMMAND_SET_RPM | 3 | 1 | RPM | RPM | \-MAX_RPM to MAX_RPM | BLDC, Cubemars |
-| VESC_COMMAND_SET_POS | 4 | 1000000 | Degrees |  | 0 to 360 | BLDC, Cubemars* & ~~Steppers~~ |
+| VESC_COMMAND_SET_POS | 4 | 1000000 | Degrees |  | 0 to 360 | BLDC, Cubemars* & Steppers |
 | VESC_COMMAND_SET_ORIGIN | 5 | N/A | `VESC_SetOrigin_Command` | Uses `commandDataExB` | N/A | Cubemars |
 | VESC_COMMAND_SET_POS_SPEED_LOOP | 6 | N/A | N/A | Uses `commandDataEx_{0,1,2}` | N/A | Cubemars |
 | VESC_COMMAND_SET_CURRENT_REL | 10 | 100000 | % / 100 |  | \-1.0 to 1.0 | BLDC |
@@ -124,14 +124,14 @@ There are 10 different status messages available with the following data:
 
 | **Command Name** | **Command Id** | **Content** | **Availability** |
 |--------------|------------|---------|---------|
-| VESC_COMMAND_STATUS_1 | 9 | ERPM, Current | BLDC & ~~Stepper~~ |
+| VESC_COMMAND_STATUS_1 | 9 | ERPM, Current | BLDC & Stepper |
 | VESC_COMMAND_STATUS_2 | 14 | Ah Used, Ah Charged | BLDC |
 | VESC_COMMAND_STATUS_3 | 15 | Wh Used, Wh Charged | BLDC |
 | VESC_COMMAND_STATUS_4 | 16 | Temp Fet, Temp Motor, Current In, PID position | BLDC |
 | VESC_COMMAND_STATUS_5 | 27 | Tachometer, Voltage In | BLDC |
 | VESC_COMMAND_STATUS_6 | 28 | ADC1, ADC2, ADC3, PPM | BLDC |
-| VESC_COMMAND_STATUS_7 | 29 | Precise Position | ~~Stepper~~ |
-| VESC_COMMAND_STATUS_8 | 30 | Weight, Distance, Humidity, Vibrations | Probe |
+| VESC_COMMAND_STATUS_7 | 29 | Precise Position | Stepper |
+| VESC_COMMAND_STATUS_8 | 30 | WeightA, WeightB, WeightC, Ph, Distance | Probe |
 | VESC_COMMAND_STATUS_9 | 31 | Potassium, Nitrogen, Phosphorus | Probe |
 | VESC_COMMAND_STATUS_10 | 32 | MCU States | ROS (ros-core) |
 | VESC_COMMAND_STATUS_11 | 41 | Cubemars status | Cubemars |
@@ -142,8 +142,8 @@ The content of the status messages is encoded as follows:
 
 | **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
 |------|------|------|-------|---------|
-| B0 - B3 | ERPM | RPM | 1 | BLDC & ~~Stepper~~ |
-| B4 - B5 | Current | A | 10 | BLDC & ~~Stepper~~ |
+| B0 - B3 | ERPM | RPM | 1 | BLDC & Stepper |
+| B4 - B5 | Current | A | 10 | BLDC & Stepper |
 | B6 - B7 | Duty Cycle | % / 100 | 1000 | BLDC |
 
 #### **VESC_COMMAND_STATUS_2**
@@ -180,25 +180,25 @@ The content of the status messages is encoded as follows:
 
 | **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
 |------|------|------|-------|---------|
-| B0 - B3 | PrecisePos | Deg | 1000000 | ~~Stepper~~ |
+| B0 - B3 | PrecisePos | Deg | 1000000 | Stepper |
 
 #### **VESC_COMMAND_STATUS_8**
 
-| **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
-|------|------|------|-------|---------|
-| B0 - B1 | WeightA | grams | 10 | Probe |
-| B2 - B3 | Distance | cm | 10 | Probe |
-| B4 | Humidity | % | 2 | Probe |
-| B5 | Vibrations | 1-bit FLAG | N/A | Probe |
-| B6 - B7 | WeightB | grams | 10 | Probe |
+| **Byte** | **Data** | **Unit** | **Scale** | **Range** | **Availability** |
+|------|------|------|-------|---------|---------|
+| B0 - B1 | WeightA  | grams | 10 | 0:3276.7 g | Probe |
+| B2 - B3 | WeightB  | grams | 10 | 0:3276.7 g | Probe |
+| B4 - B5 | WeightC  | grams | 10 | 0:3276.7 g | Probe |
+| B6      | Ph       | ph    | 10  | 0:25.5 | Probe |
+| B7      | Distance | cm    | 1   | 0:255 | Probe |
 #### **VESC_COMMAND_STATUS_9**
 
 | **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
 |------|------|------|-------|---------|
-| B0 - B1 | Potassium | mg/kg | 1 | Probe |
-| B2 - B3 | Nitrogen  | mg/kg | 1 | Probe |
-| B4 - B5 | Phosphorus | mg/kg | 1 | Probe |
-| B6 - B7 | Ph | ph | 1 | Probe |
+| B0 - B1 | Potassium | mg/kg | 1 | Probe ? |
+| B2 - B3 | Nitrogen  | mg/kg | 1 | Probe ? |
+| B4 - B5 | Phosphorus | mg/kg | 1 | Probe ? |
+| B6 - B7 | Ph | ph | 1 | Probe ? |
 
 #### **VESC_COMMAND_STATUS_10**
 > Note:  
