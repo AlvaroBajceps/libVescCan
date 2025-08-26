@@ -49,10 +49,12 @@ typedef int8_t VESC_Status_8_ph_t;
 typedef int8_t VESC_Status_8_distance_t;
 
 
-typedef int16_t VESC_Status_9_potassium_t;
-typedef int16_t VESC_Status_9_nitrogen_t;
-typedef int16_t VESC_Status_9_phosphorus_t;
-typedef int16_t VESC_Status_9_ph_t;
+typedef int16_t VESC_Status_9_voltage_t;
+typedef int16_t VESC_Status_9_current_t;
+typedef int8_t VESC_Status_9_temperature_t;
+typedef uint8_t VESC_Status_9_charge_t;
+typedef uint8_t VESC_Status_9_batteryStatus_t;
+typedef uint8_t VESC_Status_9_hotswapStatus_t;
 
 typedef int8_t VESC_Status_10_flags_t;
 typedef int8_t VESC_Status_10_communicationState_t;
@@ -177,10 +179,12 @@ typedef enum VESC_SetOrigin_Command_Enum
 #define VESC_SCALE_STATUS_8_DISTANCE 1
 
 
-#define VESC_SCALE_STATUS_9_POTASSIUM 1
-#define VESC_SCALE_STATUS_9_NITROGEN 1
-#define VESC_SCALE_STATUS_9_PHOSPHORUS 1
-#define VESC_SCALE_STATUS_9_PH 1
+#define VESC_SCALE_STATUS_9_VOLTAGE 1000
+#define VESC_SCALE_STATUS_9_CURRENT 1000
+#define VESC_SCALE_STATUS_9_TEMPERATURE 1
+#define VESC_SCALE_STATUS_9_CHARGE 1
+#define VESC_SCALE_STATUS_9_BATTERY_STATUS VESC_SCALE_NA
+#define VESC_SCALE_STATUS_9_HOTSWAP_STATUS VESC_SCALE_NA
 
 #define VESC_SCALE_STATUS_10_FLAGS VESC_SCALE_NA
 #define VESC_SCALE_STATUS_10_COMMUNICATIONSTATE VESC_SCALE_NA
@@ -260,10 +264,12 @@ enum _VESC_offsetIdx_Status_8_enum
 
 enum _VESC_offsetIdx_Status_9_enum
 {
-	_VESC_OFFSETIDX_STATUS_9_POTASSIUM = 0,
-	_VESC_OFFSETIDX_STATUS_9_NITROGEN,
-	_VESC_OFFSETIDX_STATUS_9_PHOSPHORUS,
-	_VESC_OFFSETIDX_STATUS_9_PH
+	_VESC_OFFSETIDX_STATUS_9_VOLTAGE = 0,
+	_VESC_OFFSETIDX_STATUS_9_CURRENT,
+	_VESC_OFFSETIDX_STATUS_9_TEMPERATURE,
+	_VESC_OFFSETIDX_STATUS_9_CHARGE,
+	_VESC_OFFSETIDX_STATUS_9_BATTERY_STATUS,
+	_VESC_OFFSETIDX_STATUS_9_HOTSWAP_STATUS
 };
 
 enum _VESC_offsetIdx_Status_10_enum
@@ -354,9 +360,11 @@ static const int _VESC_offset_Status_8[] =
 static const int _VESC_offset_Status_9[] =
 {
     0,
-	sizeof(VESC_Status_9_potassium_t),
-	sizeof(VESC_Status_9_potassium_t) + sizeof(VESC_Status_9_nitrogen_t),
-	sizeof(VESC_Status_9_potassium_t) + sizeof(VESC_Status_9_nitrogen_t) + sizeof(VESC_Status_9_phosphorus_t)
+	sizeof(VESC_Status_9_voltage_t),
+	sizeof(VESC_Status_9_voltage_t) + sizeof(VESC_Status_9_current_t),
+	sizeof(VESC_Status_9_voltage_t) + sizeof(VESC_Status_9_current_t) + sizeof(VESC_Status_9_temperature_t),
+	sizeof(VESC_Status_9_voltage_t) + sizeof(VESC_Status_9_current_t) + sizeof(VESC_Status_9_temperature_t) + sizeof(VESC_Status_9_charge_t),
+	sizeof(VESC_Status_9_voltage_t) + sizeof(VESC_Status_9_current_t) + sizeof(VESC_Status_9_temperature_t) + sizeof(VESC_Status_9_charge_t) + sizeof(VESC_Status_9_batteryStatus_t)
 };
 
 static const int _VESC_offset_Status_10[] =

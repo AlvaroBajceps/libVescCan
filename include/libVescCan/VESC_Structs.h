@@ -171,10 +171,12 @@ typedef struct _VESC_Status_8
 typedef struct _VESC_Status_9
 {
     VESC_Id_t vescID;
-    float potassium;
-    float nitrogen;
-    float phosphorus;
-	float ph;
+    float voltage;
+    float current;
+    float temperature;
+	float charge;
+	uint8_t batteryStatus;
+	uint8_t hotswapStatus;
 } VESC_Status_9;
 
 /// <summary>

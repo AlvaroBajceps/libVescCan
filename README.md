@@ -132,7 +132,7 @@ There are 10 different status messages available with the following data:
 | VESC_COMMAND_STATUS_6 | 28 | ADC1, ADC2, ADC3, PPM | BLDC |
 | VESC_COMMAND_STATUS_7 | 29 | Precise Position | Stepper |
 | VESC_COMMAND_STATUS_8 | 30 | WeightA, WeightB, WeightC, Ph, Distance | Probe |
-| VESC_COMMAND_STATUS_9 | 31 | Potassium, Nitrogen, Phosphorus | Probe |
+| VESC_COMMAND_STATUS_9 | 31 | Voltage, Current, Temperature, Charge, Status | Hotswap |
 | VESC_COMMAND_STATUS_10 | 32 | MCU States | ROS (ros-core) |
 | VESC_COMMAND_STATUS_11 | 41 | Cubemars status | Cubemars |
 
@@ -191,14 +191,17 @@ The content of the status messages is encoded as follows:
 | B4 - B5 | WeightC  | grams | 10 | 0:3276.7 g | Probe |
 | B6      | Ph       | ph    | 10  | 0:25.5 | Probe |
 | B7      | Distance | cm    | 1   | 0:255 | Probe |
+
 #### **VESC_COMMAND_STATUS_9**
 
-| **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
-|------|------|------|-------|---------|
-| B0 - B1 | Potassium | mg/kg | 1 | Probe ? |
-| B2 - B3 | Nitrogen  | mg/kg | 1 | Probe ? |
-| B4 - B5 | Phosphorus | mg/kg | 1 | Probe ? |
-| B6 - B7 | Ph | ph | 1 | Probe ? |
+| **Byte** | **Data**                                               | **Unit**   | **Scale**    | **Range**         | **Availability**     |
+|----------|--------------------------------------------------------|------------|--------------|-------------------|----------------------|
+| B0 - B1  | Voltage                                                | V          | 1000         | 0:65.5 V          | Hotswap              |
+| B2 - B3  | Current ( `+` &larr; charging, `–` &larr; discharging) | A          | 1000         | -32.768:32.767 A  | Hotswap              |
+| B4       | Temperature                                            | deg C      | 1            | -128:127 deg C    | Hotswap              |
+| B5       | Charge                                                 | %          | 1            | 0:100 %           | Hotswap              |
+| B6       | Battery Status                                         | ENUM       | N/A          | N/A               | Hotswap              |
+| B7       | Hotswap Status (hotswap master control): <br/><ul><li>b0 -> `hotswap_master` </li><li>b1 -> `hotswap_slaveA`</li><li>b2 -> `hotswap_slaveB`</li><li>b3 -> `drive_stop`</li><li>b4 -> `hotswap_gpio1`</li><li>b5 -> `hotswap_gpio2`</li><li>b6 -> `hotswap_gpio3`</li><li>b7 -> `hotswap_gpio4`</li></ul> | N/A         | N/A       | N/A            | Hotswap              |
 
 #### **VESC_COMMAND_STATUS_10**
 > Note:  
