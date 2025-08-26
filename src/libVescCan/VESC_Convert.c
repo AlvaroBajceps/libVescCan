@@ -175,10 +175,12 @@ bool VESC_convertStatus9ToRaw(VESC_RawFrame* out, const VESC_Status_9* in)
 	out->_reserved = VESC_CAN_EXTID_FLAG;
 	out->can_dlc = VESC_CAN_STATUS_9_DLEN;
 
-	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_POTASSIUM], in->potassium, VESC_SCALE_STATUS_9_POTASSIUM);
-	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_NITROGEN], in->nitrogen, VESC_SCALE_STATUS_9_NITROGEN);
-	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PHOSPHORUS], in->phosphorus, VESC_SCALE_STATUS_9_PHOSPHORUS);
-	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PH], in->ph, VESC_SCALE_STATUS_9_PH);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_VOLTAGE], in->voltage, VESC_SCALE_STATUS_9_VOLTAGE);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_CURRENT], in->current, VESC_SCALE_STATUS_9_CURRENT);
+	_VESC_WriteRawData8(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_TEMPERATURE], in->temperature, VESC_SCALE_STATUS_9_TEMPERATURE);
+	_VESC_WriteRawData8u(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_CHARGE], in->charge, VESC_SCALE_STATUS_9_CHARGE);
+	_VESC_WriteRawData8u(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_BATTERY_STATUS], in->batteryStatus, VESC_SCALE_STATUS_9_BATTERY_STATUS);
+	_VESC_WriteRawData8u(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_HOTSWAP_STATUS], in->hotswapStatus, VESC_SCALE_STATUS_9_HOTSWAP_STATUS);
 
 	return true;
 }
@@ -382,10 +384,12 @@ bool VESC_convertRawToStatus9(VESC_Status_9* out, const VESC_RawFrame* in)
 
 	out->vescID = in->vescID;
 
-	_VESC_ReadRawData16(out->potassium, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_POTASSIUM], VESC_SCALE_STATUS_9_POTASSIUM,/*none*/);
-	_VESC_ReadRawData16(out->nitrogen, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_NITROGEN], VESC_SCALE_STATUS_9_NITROGEN,/*none*/);
-	_VESC_ReadRawData16(out->phosphorus, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PHOSPHORUS], VESC_SCALE_STATUS_9_PHOSPHORUS,/*none*/);
-	_VESC_ReadRawData16(out->ph, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_PH], VESC_SCALE_STATUS_9_PH,/*none*/);
+	_VESC_ReadRawData16(out->voltage, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_VOLTAGE], VESC_SCALE_STATUS_9_VOLTAGE,/*none*/);
+	_VESC_ReadRawData16(out->current, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_CURRENT], VESC_SCALE_STATUS_9_CURRENT,/*none*/);
+	_VESC_ReadRawData8(out->temperature, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_TEMPERATURE], VESC_SCALE_STATUS_9_TEMPERATURE,/*none*/);
+	_VESC_ReadRawData8u(out->charge, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_CHARGE], VESC_SCALE_STATUS_9_CHARGE,/*none*/);
+	_VESC_ReadRawData8u(out->batteryStatus, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_BATTERY_STATUS], VESC_SCALE_STATUS_9_BATTERY_STATUS,/*none*/);
+	_VESC_ReadRawData8u(out->hotswapStatus, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_HOTSWAP_STATUS], VESC_SCALE_STATUS_9_HOTSWAP_STATUS,/*none*/);
 
 	return true;
 }
