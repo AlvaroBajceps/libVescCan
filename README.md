@@ -198,9 +198,10 @@ The content of the status messages is encoded as follows:
 |----------|--------------------------------------------------------|------------|--------------|-------------------|----------------------|
 | B0 - B1  | Voltage                                                | V          | 1000         | 0:65.5 V          | Hotswap              |
 | B2 - B3  | Current ( `+` &larr; charging, `–` &larr; discharging) | A          | 1000         | -32.768:32.767 A  | Hotswap              |
-| B4 - B5  | Temperature                                            | K          | 10           | 0:6553.5 K        | Hotswap              |
-| B6       | Charge                                                 | %          | 1            | 0:100 %           | Hotswap              |
-| B7       | Status (hotswap master control): <br/><ul><li>b0 -> `hotswap_master` </li><li>b1 -> `hotswap_slaveA`</li><li>b2 -> `hotswap_slaveB`</li><li>b3 -> `hotswap_gpio0`</li><li>b4 -> `hotswap_gpio1`</li><li>b5 -> `hotswap_gpio2`</li><li>b6 -> `hotswap_gpio3`</li><li>b7 -> `hotswap_gpio4`</li></ul> | N/A         | N/A       | N/A            | Hotswap              |
+| B4       | Temperature                                            | deg C      | 1            | -128:127 deg C    | Hotswap              |
+| B5       | Charge                                                 | %          | 1            | 0:100 %           | Hotswap              |
+| B6       | Battery Status                                         | ENUM       | N/A          | N/A               | Hotswap              |
+| B7       | Hotswap Status (hotswap master control): <br/><ul><li>b0 -> `hotswap_master` </li><li>b1 -> `hotswap_slaveA`</li><li>b2 -> `hotswap_slaveB`</li><li>b3 -> `drive_stop`</li><li>b4 -> `hotswap_gpio1`</li><li>b5 -> `hotswap_gpio2`</li><li>b6 -> `hotswap_gpio3`</li><li>b7 -> `hotswap_gpio4`</li></ul> | N/A         | N/A       | N/A            | Hotswap              |
 
 #### **VESC_COMMAND_STATUS_10**
 > Note:  
