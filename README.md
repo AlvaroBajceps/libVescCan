@@ -207,10 +207,50 @@ The content of the status messages is encoded as follows:
 > Note:  
 > Properly described [here](https://github.com/wisniax/RoverControlApp/wiki#-mqtt-rover-status)  
 
-| **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
-|------|------|------|-------|---------|
-| B0 | Communication State | `VESC_Status_10_CommunicationState` | N/A | ROS |
-| B1 - B2 | Control Mode   | `VESC_Status_10_ControlMode` | N/A | ROS |
+<table>
+  <thead>
+    <tr>
+      <th>Byte</th>
+      <th>Data</th>
+      <th>Unit</th>
+      <th>Scale</th>
+      <th>Availability</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>B0</td>
+      <td>Communication State</td>
+      <td><code>VESC_Status_10_CommunicationState</code></td>
+      <td>N/A</td>
+      <td>ROS</td>
+    </tr>
+    <tr>
+      <td>B1 - B2</td>
+      <td>Control Mode
+        <details>
+            <summary>Bit-map</summary>
+            <ul>
+            <li>b0  -> ESTOP</li>
+            <li>b1  -> STOP</li>
+            <li>b2  -> CONFIG</li>
+            <li>b3  -> DRIVE</li>
+            <li>b4  -> ROBOTIC_ARM</li>
+            <li>b5  -> DEEP_SAMPLER</li>
+            <li>b6  -> SURFACE_SAMPLER</li>
+            <li>b7  -> DRIVE_AUTONOMY</li>
+            <li>b8  -> ROBOTIC_ARM_AUTONOMY</li>
+            <li>b9  -> DEEP_SAMPLER_AUTONOMY</li>
+            <li>b10 -> SURFACE_SAMPLER_AUTONOMY</li>
+            </ul>
+        </details>
+      </td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>ROS</td>
+    </tr>
+  </tbody>
+</table>
 
 #### **VESC_COMMAND_STATUS_11**
 
