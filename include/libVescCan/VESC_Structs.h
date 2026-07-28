@@ -187,9 +187,8 @@ typedef struct _VESC_Status_9
 typedef struct _VESC_Status_10
 {
     VESC_Id_t vescID;
-    VESC_Status_10_flags_t flags;
     VESC_Status_10_CommunicationState communicationState;
-	VESC_Status_10_ControlMode controlMode;
+	VESC_Status_10_controlMode_t controlMode;
 } VESC_Status_10;
 
 /// <summary>

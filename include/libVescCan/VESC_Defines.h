@@ -9,11 +9,11 @@
 
 #define VESC_CAN_EXTID_FLAG 0x8000
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(LIBVESCCAN_DISABLEPACK)
 #define _VESC_GCC_ATTRIBUTE_PACKED __attribute__((packed))
 #else
 #define _VESC_GCC_ATTRIBUTE_PACKED
-#endif //__GNUC__
+#endif //defined(__GNUC__) && !defined(LIBVESCCAN_DISABLEPACK)
 
 #define VESC_ZeroMemory(dst,len) memset(dst, 0, len)
 

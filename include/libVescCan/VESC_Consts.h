@@ -56,9 +56,8 @@ typedef uint8_t VESC_Status_9_charge_t;
 typedef uint8_t VESC_Status_9_batteryStatus_t;
 typedef uint8_t VESC_Status_9_hotswapStatus_t;
 
-typedef int8_t VESC_Status_10_flags_t;
-typedef int8_t VESC_Status_10_communicationState_t;
-typedef int8_t VESC_Status_10_controlMode_t;
+typedef uint8_t VESC_Status_10_communicationState_t;
+typedef uint16_t VESC_Status_10_controlMode_t;
 
 typedef int16_t VESC_Status_11_position_t;
 typedef int16_t VESC_Status_11_speed_t;
@@ -186,7 +185,6 @@ typedef enum VESC_SetOrigin_Command_Enum
 #define VESC_SCALE_STATUS_9_BATTERY_STATUS VESC_SCALE_NA
 #define VESC_SCALE_STATUS_9_HOTSWAP_STATUS VESC_SCALE_NA
 
-#define VESC_SCALE_STATUS_10_FLAGS VESC_SCALE_NA
 #define VESC_SCALE_STATUS_10_COMMUNICATIONSTATE VESC_SCALE_NA
 #define VESC_SCALE_STATUS_10_CONTROLMODE VESC_SCALE_NA
 
@@ -274,9 +272,8 @@ enum _VESC_offsetIdx_Status_9_enum
 
 enum _VESC_offsetIdx_Status_10_enum
 {
-	_VESC_OFFSETIDX_STATUS_10_FLAGS = 0,
-	_VESC_OFFSETIDX_STATUS_10_COMMUNICATIONSTATE,
-	_VESC_OFFSETIDX_STATUS_10_CONTROLMODE
+	_VESC_OFFSETIDX_STATUS_10_COMMUNICATIONSTATE = 0,
+	_VESC_OFFSETIDX_STATUS_10_CONTROLMODE,
 };
 
 enum _VESC_offsetIdx_Status_11_enum
@@ -370,8 +367,7 @@ static const int _VESC_offset_Status_9[] =
 static const int _VESC_offset_Status_10[] =
 {
     0,
-	sizeof(VESC_Status_10_flags_t),
-	sizeof(VESC_Status_10_flags_t) + sizeof(VESC_Status_10_communicationState_t)
+    sizeof(VESC_Status_10_communicationState_t),
 };
 
 static const int _VESC_offset_Status_11[] =
