@@ -12,6 +12,11 @@ set(CMAKE_STATIC_LIBRARY_PREFIX "")
 # Promote warningless code
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
+# Option to disable packing
+option(LIBVESCCAN_DISABLEPACK "Disable attribute packed." FALSE)
+if(LIBVESCCAN_DISABLEPACK) 
+	add_compile_definitions(LIBVESCCAN_DISABLEPACK)
+endif()
 
 # build lib
 add_library(libVescCan STATIC
