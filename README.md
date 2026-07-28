@@ -209,9 +209,8 @@ The content of the status messages is encoded as follows:
 
 | **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
 |------|------|------|-------|---------|
-| B0 | Flags: <br/><ul><li>b0 -> Pad Connected</li><li>b1 -> Motor Cut-Off button</li></ul> | N/A | N/A | ROS |
-| B1 | Communication State | `VESC_Status_10_CommunicationState` | N/A | ROS |
-| B2 | Control Mode   | `VESC_Status_10_ControlMode` | N/A | ROS |
+| B0 | Communication State | `VESC_Status_10_CommunicationState` | N/A | ROS |
+| B1 - B2 | Control Mode   | `VESC_Status_10_ControlMode` | N/A | ROS |
 
 #### **VESC_COMMAND_STATUS_11**
 
