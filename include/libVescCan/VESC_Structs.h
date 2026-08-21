@@ -1,10 +1,12 @@
 #ifndef VESC_Structs_h_
 #define VESC_Structs_h_
 
+#include <libVescCan/VESC_Mux_Config_1_Consts.h>
 #include <libVescCan/VESC_Defines.h>
 #include <libVescCan/VESC_Consts.h>
 #include <libVescCan/VESC_Status_10_Consts.h>
 #include <libVescCan/VESC_Status_11_Consts.h>
+#include <stdint.h>
 
 //****
 // structs
@@ -205,5 +207,92 @@ typedef struct _VESC_Status_11
     VESC_Status_11_ErrorCode errorCode;
 
 } VESC_Status_11;
+
+/// <summary>
+/// Mux Config 1 frame (note: camera/mux frame)
+/// Convert to VESC_RawFrame before sending!
+/// </summary>
+typedef struct _VESC_Mux_Config_1
+{
+    VESC_Id_t vescID;
+    struct {
+        bool state;
+        VESC_Mux_Config_1_Mode mode;
+        uint8_t _reserved;
+    } settings;
+    struct {
+        VESC_Mux_Config_1_Power power;
+        VESC_Mux_Config_1_Band band;
+        uint8_t channel;
+        uint8_t _reserved;
+    } vtxConfig;
+} VESC_Mux_Config_1;
+
+/// <summary>
+/// Mux CamSelect frame (note: camera/mux frame)
+/// Convert to VESC_RawFrame before sending!
+/// </summary>
+typedef struct _VESC_Mux_CamSel
+{
+    VESC_Id_t vescID;
+    uint8_t cameraSelect;
+} VESC_Mux_CamSel;
+
+// <summary>
+/// Mux Status frame (note: camera/mux frame)
+/// Convert to VESC_RawFrame before sending!
+/// </summary>
+typedef struct _VESC_Mux_Status
+{
+    VESC_Id_t vescID;
+    struct {
+        bool state;
+        VESC_Mux_Config_1_Mode mode;
+        uint8_t _reserved;
+    } settings;
+    struct {
+        VESC_Mux_Config_1_Power power;
+        VESC_Mux_Config_1_Band band;
+        uint8_t channel;
+        uint8_t _reserved;
+    } vtxConfig;
+    uint8_t cameraSelect;
+    float vtxTemp;
+    float boardTemp;
+} VESC_Mux_Status;
+
+//****
+// internal structs
+//****
+
+typedef struct _VESC_CAN_Mux_Config_1_settings
+{
+    uint8_t state : 1;
+    uint8_t mode : 2;
+    uint8_t reserved : 5;
+} VESC_CAN_Mux_Config_1_settings ;
+
+typedef struct _VESC_CAN_Mux_Config_1_vtxConfig
+{
+    uint8_t power : 2;
+    uint8_t band : 2;
+    uint8_t channel : 3;
+    uint8_t reserved : 1;
+} VESC_CAN_Mux_Config_1_vtxConfig ;
+
+typedef struct _VESC_CAN_Mux_Status_settings
+{
+    uint8_t state : 1;
+    uint8_t mode : 2;
+    uint8_t reserved : 5;
+} VESC_CAN_Mux_Status_settings ;
+
+typedef struct _VESC_CAN_Mux_Status_vtxConfig
+{
+    uint8_t power : 2;
+    uint8_t band : 2;
+    uint8_t channel : 3;
+    uint8_t reserved : 1;
+} VESC_CAN_Mux_Status_vtxConfig ;
 
 #endif //VESC_Structs_h_

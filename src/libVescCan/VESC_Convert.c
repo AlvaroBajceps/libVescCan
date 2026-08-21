@@ -1,4 +1,6 @@
 #include "libVescCan/VESC_Consts.h"
+#include "libVescCan/VESC_Mux_Config_1_Consts.h"
+#include "libVescCan/VESC_Structs.h"
 #include <libVescCan/VESC_Convert.h>
 
 bool VESC_convertCmdToRaw(VESC_RawFrame* out, const VESC_CommandFrame* in)
@@ -194,6 +196,77 @@ bool VESC_convertStatus10ToRaw(VESC_RawFrame* out, const VESC_Status_10* in)
 
 	_VESC_WriteRawData8u(out, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_COMMUNICATIONSTATE], in->communicationState, VESC_SCALE_STATUS_10_COMMUNICATIONSTATE);
 	_VESC_WriteRawData16u(out, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_CONTROLMODE], in->controlMode, VESC_SCALE_STATUS_10_CONTROLMODE);
+
+	return true;
+}
+
+bool VESC_convertMuxConfig1ToRaw(VESC_RawFrame* out, const VESC_Mux_Config_1* in)
+{
+	out->vescID = in->vescID;
+	out->command = VESC_COMMAND_MUX_CONFIG_1;
+	out->_reserved = VESC_CAN_EXTID_FLAG;
+	out->can_dlc = VESC_CAN_MUX_CONFIG_1_DLEN;
+
+	VESC_CAN_Mux_Config_1_settings settings_raw = 
+	{
+		in->settings.state & VESC_CAN_MUX_CONFIG_1_SETTINGS_STATE_MASK,
+		in->settings.mode & VESC_CAN_MUX_CONFIG_1_SETTINGS_MODE_MASK,
+		in->settings._reserved & VESC_CAN_MUX_CONFIG_1_SETTINGS_RESERVED_MASK,
+	};
+
+	VESC_CAN_Mux_Config_1_vtxConfig vtxConfig_raw = 
+	{
+		in->vtxConfig.power & VESC_CAN_MUX_CONFIG_1_VTXCONFIG_POWER_MASK,
+		in->vtxConfig.band & VESC_CAN_MUX_CONFIG_1_VTXCONFIG_BAND_MASK,
+		in->vtxConfig.channel & VESC_CAN_MUX_CONFIG_1_VTXCONFIG_CHANNEL_MASK,
+		in->vtxConfig._reserved & VESC_CAN_MUX_CONFIG_1_VTXCONFIG_RESERVED_MASK,
+	};
+
+	_VESC_WriteRawData8u(out, _VESC_offset_Mux_Config_1[_VESC_OFFSETIDX_MUX_CONFIG_1_SETTINGS], *((uint8_t*)&settings_raw), VESC_SCALE_MUX_CONFIG_1_SETTINGS);
+	_VESC_WriteRawData8u(out, _VESC_offset_Mux_Config_1[_VESC_OFFSETIDX_MUX_CONFIG_1_VTX_CONFIG], *((uint8_t*)&vtxConfig_raw), VESC_SCALE_MUX_CONFIG_1_VTXCONFIG);
+
+	return true;
+}
+
+bool VESC_convertMuxCamSelToRaw(VESC_RawFrame* out, const VESC_Mux_CamSel* in)
+{
+	out->vescID = in->vescID;
+	out->command = VESC_COMMAND_MUX_CAMSEL;
+	out->_reserved = VESC_CAN_EXTID_FLAG;
+	out->can_dlc = VESC_CAN_MUX_CAMSEL_DLEN;
+
+	_VESC_WriteRawData8u(out, _VESC_offset_Mux_CamSel[_VESC_OFFSETIDX_MUX_CAMSEL_CAMERA_SELECT], in->cameraSelect, VESC_SCALE_MUX_CAMSEL_CAMERA_SELECT);
+
+	return true;
+}
+
+bool VESC_convertMuxStatusToRaw(VESC_RawFrame* out, const VESC_Mux_Status* in)
+{
+	out->vescID = in->vescID;
+	out->command = VESC_COMMAND_MUX_STATUS;
+	out->_reserved = VESC_CAN_EXTID_FLAG;
+	out->can_dlc = VESC_CAN_MUX_STATUS_DLEN;
+
+	VESC_CAN_Mux_Config_1_settings settings_raw = 
+	{
+		in->settings.state & VESC_CAN_MUX_STATUS_SETTINGS_STATE_MASK,
+		in->settings.mode & VESC_CAN_MUX_STATUS_SETTINGS_MODE_MASK,
+		in->settings._reserved & VESC_CAN_MUX_STATUS_SETTINGS_RESERVED_MASK,
+	};
+
+	VESC_CAN_Mux_Config_1_vtxConfig vtxConfig_raw = 
+	{
+		in->vtxConfig.power & VESC_CAN_MUX_STATUS_VTXCONFIG_POWER_MASK,
+		in->vtxConfig.band & VESC_CAN_MUX_STATUS_VTXCONFIG_BAND_MASK,
+		in->vtxConfig.channel & VESC_CAN_MUX_STATUS_VTXCONFIG_CHANNEL_MASK,
+		in->vtxConfig._reserved & VESC_CAN_MUX_STATUS_VTXCONFIG_RESERVED_MASK,
+	};
+
+	_VESC_WriteRawData8u(out, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_SETTINGS], *((uint8_t*)&settings_raw), VESC_SCALE_MUX_STATUS_SETTINGS);
+	_VESC_WriteRawData8u(out, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_VTX_CONFIG], *((uint8_t*)&vtxConfig_raw), VESC_SCALE_MUX_STATUS_VTXCONFIG);
+	_VESC_WriteRawData8u(out, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_CAMERA_SELECT], in->cameraSelect, VESC_SCALE_MUX_STATUS_CAMERA_SELECT);
+	_VESC_WriteRawData16(out, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_VTX_TEMP], in->vtxTemp, VESC_SCALE_MUX_STATUS_VTX_TEMP);
+	_VESC_WriteRawData16(out, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_BOARD_TEMP], in->boardTemp, VESC_SCALE_MUX_STATUS_BOARD_TEMP);
 
 	return true;
 }
@@ -402,6 +475,72 @@ bool VESC_convertRawToStatus10(VESC_Status_10* out, const VESC_RawFrame* in)
 
 	_VESC_ReadRawData8u(out->communicationState, in, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_COMMUNICATIONSTATE], VESC_SCALE_STATUS_10_COMMUNICATIONSTATE,(VESC_Status_10_CommunicationState));
 	_VESC_ReadRawData16u(out->controlMode, in, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_CONTROLMODE], VESC_SCALE_STATUS_10_CONTROLMODE,(VESC_Status_10_controlMode_t));
+
+	return true;
+}
+
+bool VESC_convertRawToMuxConfig1(VESC_Mux_Config_1* out, const VESC_RawFrame* in)
+{
+	if (in->command != VESC_COMMAND_MUX_CONFIG_1)
+		return false;
+
+	out->vescID = in->vescID;
+
+	VESC_CAN_Mux_Config_1_settings settings_raw ;
+
+	VESC_CAN_Mux_Config_1_vtxConfig vtxConfig_raw ;
+
+	_VESC_ReadRawData8u(*((uint8_t*)&settings_raw), in, _VESC_offset_Mux_Config_1[_VESC_OFFSETIDX_MUX_CONFIG_1_SETTINGS], VESC_SCALE_MUX_CONFIG_1_SETTINGS,(uint8_t));
+	out->settings.state = settings_raw.state;
+	out->settings.mode = settings_raw.mode;
+	out->settings._reserved = settings_raw.reserved;
+
+	_VESC_ReadRawData8u(*((uint8_t*)&vtxConfig_raw), in, _VESC_offset_Mux_Config_1[_VESC_OFFSETIDX_MUX_CONFIG_1_VTX_CONFIG], VESC_SCALE_MUX_CONFIG_1_VTXCONFIG,(uint8_t));
+	out->vtxConfig.power = vtxConfig_raw.power;
+	out->vtxConfig.band = vtxConfig_raw.band;
+	out->vtxConfig.channel = vtxConfig_raw.channel;
+	out->vtxConfig._reserved = vtxConfig_raw.reserved;
+
+	return true;
+}
+
+bool VESC_convertRawToMuxCamSel(VESC_Mux_CamSel* out, const VESC_RawFrame* in)
+{
+	if (in->command != VESC_COMMAND_MUX_CAMSEL)
+		return false;
+
+	out->vescID = in->vescID;
+
+	_VESC_ReadRawData8u(out->cameraSelect, in, _VESC_offset_Mux_CamSel[_VESC_OFFSETIDX_MUX_CAMSEL_CAMERA_SELECT], VESC_SCALE_MUX_CAMSEL_CAMERA_SELECT, (VESC_Mux_CamSel_cameraSelect_t));
+
+	return true;
+}
+
+bool VESC_convertRawToMuxStatus(VESC_Mux_Status* out, const VESC_RawFrame* in)
+{
+	if (in->command != VESC_COMMAND_MUX_STATUS)
+		return false;
+
+	out->vescID = in->vescID;
+
+	VESC_CAN_Mux_Status_settings settings_raw ;
+
+	VESC_CAN_Mux_Status_vtxConfig vtxConfig_raw ;
+
+	_VESC_ReadRawData8u(*((uint8_t*)&settings_raw), in, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_SETTINGS], VESC_SCALE_MUX_STATUS_SETTINGS,(uint8_t));
+	out->settings.state = settings_raw.state;
+	out->settings.mode = settings_raw.mode;
+	out->settings._reserved = settings_raw.reserved;
+
+	_VESC_ReadRawData8u(*((uint8_t*)&vtxConfig_raw), in, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_VTX_CONFIG], VESC_SCALE_MUX_STATUS_VTXCONFIG,(uint8_t));
+	out->vtxConfig.power = vtxConfig_raw.power;
+	out->vtxConfig.band = vtxConfig_raw.band;
+	out->vtxConfig.channel = vtxConfig_raw.channel;
+	out->vtxConfig._reserved = vtxConfig_raw.reserved;
+
+	_VESC_ReadRawData8u(out->cameraSelect, in, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_CAMERA_SELECT], VESC_SCALE_MUX_STATUS_CAMERA_SELECT, /*none*/);
+	_VESC_ReadRawData16(out->vtxTemp, in, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_VTX_TEMP], VESC_SCALE_MUX_STATUS_VTX_TEMP, /*none*/);
+	_VESC_ReadRawData16(out->boardTemp, in, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_BOARD_TEMP], VESC_SCALE_MUX_STATUS_BOARD_TEMP, /*none*/);
 
 	return true;
 }

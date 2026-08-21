@@ -134,6 +134,9 @@ There are 10 different status messages available with the following data:
 | VESC_COMMAND_STATUS_8 | 30 | WeightA, WeightB, WeightC, Ph, Distance | Probe |
 | VESC_COMMAND_STATUS_9 | 31 | Voltage, Current, Temperature, Charge, Status | Hotswap |
 | VESC_COMMAND_STATUS_10 | 32 | MCU States | ROS (ros-core) |
+| VESC_COMMAND_MUX_CONFIG_1 | 33 | Settings.State, Settings.Mode, VtxConfig.Power, VtxConfig.Band, VtxConfig.Channel | N/A |
+| VESC_COMMAND_MUX_CAMSEL | 34 | CameraSelect | N/A |
+| VESC_COMMAND_MUX_STATUS | 35 | Settings.State, Settings.Mode, VtxConfig.Power, VtxConfig.Band, VtxConfig.Channel, Camera Select, Temp VTX, Temp Board | N/A |
 | VESC_COMMAND_STATUS_11 | 41 | Cubemars status | Cubemars |
 
 The content of the status messages is encoded as follows:
@@ -261,6 +264,146 @@ The content of the status messages is encoded as follows:
 | B4 - B5 | Current | A | 100 | Cubemars |
 | B6 | Motor Temp | DegC | 1 | Cubemars |
 | B7 | Error Code | `VESC_Status_11_ErrorCode` | N/A | Cubemars |
+
+#### **VESC_COMMAND_MUX_CONFIG_1**
+
+<table>
+  <thead>
+    <tr>
+      <th>Byte</th>
+      <th>Data</th>
+      <th>Unit</th>
+      <th>Scale</th>
+      <th>Availability</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>B0</td>
+      <td>Settings
+        <details>
+          <summary>Bit-map</summary>
+          <ul>
+            <li>b0   -> state (powers state of cameras, disables vtx when 0; on when 1)</li>
+            <li>b1-2 -> mode 
+              <ul>
+                <li>[0b00] - all off</li>
+                <li>[0b01] - selected on</li>
+                <li>[0b10] - neighbours on</li>
+                <li>[0b11] - all on</li>
+              </ul>
+              see <code>VESC_Mux_Config_1_Mode</code>
+              </li>
+            <li>b3-7 -> reserved</li>
+          </ul>
+        </details>
+      </td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>B1</td>
+      <td>VTX Config
+        <details>
+            <summary>Bit-map</summary>
+            <ul>
+              <li>b0-1 -> power
+                <ul>
+                  <li>[0b00] - 25 mW</li>
+                  <li>[0b01] - 200 mW</li>
+                  <li>[0b10] - 400 mW</li>
+                  <li>[0b11] - 800 mW</li>
+                </ul>
+                see <code>VESC_Mux_Config_1_Power</code>
+              </li>
+              <li>b2-3 -> band
+                <ul>
+                  <li>[0b00] - A</li>
+                  <li>[0b01] - B</li>
+                  <li>[0b10] - F</li>
+                  <li>[0b11] - R</li>
+                </ul>
+                see <code>VESC_Mux_Config_1_Band</code>
+              </li>
+              <li>b4-6 -> channel (0-7; depends on band)</li>
+              <li>b7   -> reserved</li>
+            </ul>
+        </details>
+      </td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+  </tbody>
+</table>
+
+#### **VESC_COMMAND_MUX_CAMSEL**
+
+<table>
+  <thead>
+    <tr>
+      <th>Byte</th>
+      <th>Data</th>
+      <th>Unit</th>
+      <th>Scale</th>
+      <th>Availability</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>B0</td>
+      <td>CameraSelect</td>
+      <td>Number</td>
+      <td>1</td>
+      <td>N/A</td>
+    </tr>
+  </tbody>
+</table>
+
+#### **VESC_COMMAND_MUX_STATUS**
+
+<table>
+  <thead>
+    <tr>
+      <th>Byte</th>
+      <th>Data</th>
+      <th>Unit</th>
+      <th>Scale</th>
+      <th>Availability</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>B0 - B1</td>
+      <td>see <code>VESC_COMMAND_MUX_CONFIG_1</code></td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>B2</td>
+      <td>CameraSelect</td>
+      <td>Number</td>
+      <td>1</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>B3 - B4</td>
+      <td>Temp VTX</td>
+      <td>deg C</td>
+      <td>10</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>B5 - B6</td>
+      <td>Temp Board</td>
+      <td>deg C</td>
+      <td>10</td>
+      <td>N/A</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Frequently Asked Questions (FAQ)
 
