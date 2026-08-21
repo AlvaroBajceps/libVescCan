@@ -17,4 +17,6 @@
 
 #define VESC_ZeroMemory(dst,len) memset(dst, 0, len)
 
+#define VESC_CreateMask(bits) ((1 << (1+bits)) - 1)
+
 #endif //VESC_Defines_h_

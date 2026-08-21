@@ -30,35 +30,6 @@
 // to VESC_RawFrame
 //****
 
-#ifndef __cplusplus //c++ lacks support for C11 _Generic
-#define VESC_convertXToRaw(out, in) _Generic((in), \
-    const VESC_CommandFrame*:VESC_convertCmdToRaw, \
-    const VESC_Status_1*:VESC_convertStatus1ToRaw, \
-    const VESC_Status_2*:VESC_convertStatus2ToRaw, \
-    const VESC_Status_3*:VESC_convertStatus3ToRaw, \
-    const VESC_Status_4*:VESC_convertStatus4ToRaw, \
-    const VESC_Status_5*:VESC_convertStatus5ToRaw, \
-    const VESC_Status_6*:VESC_convertStatus6ToRaw, \
-    const VESC_Status_7*:VESC_convertStatus7ToRaw, \
-    const VESC_Status_8*:VESC_convertStatus8ToRaw, \
-    const VESC_Status_9*:VESC_convertStatus9ToRaw, \
-    const VESC_Status_10*:VESC_convertStatus10ToRaw, \
-    const VESC_Status_11*:VESC_convertStatus11ToRaw, \
-    VESC_CommandFrame*:VESC_convertCmdToRaw, \
-    VESC_Status_1*:VESC_convertStatus1ToRaw, \
-    VESC_Status_2*:VESC_convertStatus2ToRaw, \
-    VESC_Status_3*:VESC_convertStatus3ToRaw, \
-    VESC_Status_4*:VESC_convertStatus4ToRaw, \
-    VESC_Status_5*:VESC_convertStatus5ToRaw, \
-    VESC_Status_6*:VESC_convertStatus6ToRaw, \
-    VESC_Status_7*:VESC_convertStatus7ToRaw, \
-    VESC_Status_8*:VESC_convertStatus8ToRaw, \
-    VESC_Status_9*:VESC_convertStatus9ToRaw, \
-    VESC_Status_10*:VESC_convertStatus10ToRaw \
-    VESC_Status_11*:VESC_convertStatus11ToRaw \
-)(out,in)
-#endif
-
 bool VESC_convertCmdToRaw(VESC_RawFrame* out, const VESC_CommandFrame* in);
 
 bool VESC_convertStatus1ToRaw(VESC_RawFrame* out, const VESC_Status_1* in);
@@ -81,29 +52,18 @@ bool VESC_convertStatus9ToRaw(VESC_RawFrame* out, const VESC_Status_9* in);
 
 bool VESC_convertStatus10ToRaw(VESC_RawFrame* out, const VESC_Status_10* in);
 
+bool VESC_convertMuxConfig1ToRaw(VESC_RawFrame* out, const VESC_Mux_Config_1* in);
+
+bool VESC_convertMuxCamSelToRaw(VESC_RawFrame* out, const VESC_Mux_CamSel* in);
+
+bool VESC_convertMuxStatusToRaw(VESC_RawFrame* out, const VESC_Mux_Status* in);
+
 bool VESC_convertStatus11ToRaw(VESC_RawFrame* out, const VESC_Status_11* in);
 
 
 //****
 // from VESC_RawFrame
 //****
-
-#ifndef __cplusplus //c++ lacks support for C11 _Generic
-#define VESC_convertRawToX(out, in) _Generic((out), \
-    VESC_CommandFrame*:VESC_convertRawToCmd, \
-    VESC_Status_1*:VESC_convertRawToStatus1, \
-    VESC_Status_2*:VESC_convertRawToStatus2, \
-    VESC_Status_3*:VESC_convertRawToStatus3, \
-    VESC_Status_4*:VESC_convertRawToStatus4, \
-    VESC_Status_5*:VESC_convertRawToStatus5, \
-    VESC_Status_6*:VESC_convertRawToStatus6, \
-    VESC_Status_7*:VESC_convertRawToStatus7, \
-    VESC_Status_8*:VESC_convertRawToStatus8, \
-    VESC_Status_9*:VESC_convertRawToStatus9, \
-    VESC_Status_10*:VESC_convertRawToStatus10 \
-    VESC_Status_11*:VESC_convertRawToStatus11 \
-)(out,in)
-#endif
 
 bool VESC_convertRawToCmd(VESC_CommandFrame* out, const VESC_RawFrame* in);
 
@@ -126,6 +86,12 @@ bool VESC_convertRawToStatus8(VESC_Status_8* out, const VESC_RawFrame* in);
 bool VESC_convertRawToStatus9(VESC_Status_9* out, const VESC_RawFrame* in);
 
 bool VESC_convertRawToStatus10(VESC_Status_10* out, const VESC_RawFrame* in);
+
+bool VESC_convertRawToMuxConfig1(VESC_Mux_Config_1* out, const VESC_RawFrame* in);
+
+bool VESC_convertRawToMuxCamSel(VESC_Mux_CamSel* out, const VESC_RawFrame* in);
+
+bool VESC_convertRawToMuxStatus(VESC_Mux_Status* out, const VESC_RawFrame* in);
 
 bool VESC_convertRawToStatus11(VESC_Status_11* out, const VESC_RawFrame* in);
 
