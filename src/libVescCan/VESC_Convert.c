@@ -292,26 +292,15 @@ bool VESC_convertStatus12ToRaw(VESC_RawFrame* out, const VESC_Status_12* in)
 	if (out == NULL || in == NULL)
 		return false;
 
-	float clamped_components[] = { in->w, in->x, in->y, in->z };
-	
-	for (unsigned int i = 0; i < 4; ++i)
-	{
-		if (clamped_components[i] < -1.0f)
-			clamped_components[i] = -1.0f;
-		else 
-		if (clamped_components[i] > 1.0f)
-			clamped_components[i] = 1.0f;
-	}
-
 	out->vescID = in->vescID;
 	out->command = VESC_COMMAND_STATUS_12;
 	out->_reserved = VESC_CAN_EXTID_FLAG;
 	out->can_dlc = VESC_CAN_STATUS_12_DLEN;
 
-	_VESC_WriteRawData16(out, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_W], clamped_components[0], VESC_SCALE_STATUS_12_W);
-	_VESC_WriteRawData16(out, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_X], clamped_components[1], VESC_SCALE_STATUS_12_X);
-	_VESC_WriteRawData16(out, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_Y], clamped_components[2], VESC_SCALE_STATUS_12_Y);
-	_VESC_WriteRawData16(out, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_Z], clamped_components[3], VESC_SCALE_STATUS_12_Z);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_W], in->w, VESC_SCALE_STATUS_12_W);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_X], in->x, VESC_SCALE_STATUS_12_X);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_Y], in->y, VESC_SCALE_STATUS_12_Y);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_Z], in->z, VESC_SCALE_STATUS_12_Z);
 	return true;
 }
 
