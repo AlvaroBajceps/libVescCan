@@ -582,20 +582,11 @@ bool VESC_convertRawToStatus12(VESC_Status_12* out, const VESC_RawFrame* in)
 		in->can_dlc != VESC_CAN_STATUS_12_DLEN)
 		return false;
 
-	float components[4];
-	const float scales[] = { VESC_SCALE_STATUS_12_W, VESC_SCALE_STATUS_12_X,
-		VESC_SCALE_STATUS_12_Y, VESC_SCALE_STATUS_12_Z };
-	for (unsigned int i = 0; i < 4; ++i)
-	{
-		const int offset = _VESC_offset_Status_12[i];
-		const uint16_t bits = ((uint16_t)in->rawData[offset] << 8) | in->rawData[offset + 1];
-		const int32_t value = bits >= 0x8000u ? (int32_t)bits - 0x10000 : (int32_t)bits;
-		components[i] = (float)value / scales[i];
-	}
 	out->vescID = in->vescID;
-	out->w = components[_VESC_OFFSETIDX_STATUS_12_W];
-	out->x = components[_VESC_OFFSETIDX_STATUS_12_X];
-	out->y = components[_VESC_OFFSETIDX_STATUS_12_Y];
-	out->z = components[_VESC_OFFSETIDX_STATUS_12_Z];
+
+	_VESC_ReadRawData16(out->x, in, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_X], VESC_SCALE_STATUS_12_X,/*none*/);
+	_VESC_ReadRawData16(out->y, in, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_Y], VESC_SCALE_STATUS_12_Y,/*none*/);
+	_VESC_ReadRawData16(out->z, in, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_Z], VESC_SCALE_STATUS_12_Z,/*none*/);
+	_VESC_ReadRawData16(out->w, in, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_W], VESC_SCALE_STATUS_12_W,/*none*/);
 	return true;
 }
