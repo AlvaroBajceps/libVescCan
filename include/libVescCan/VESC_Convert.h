@@ -60,6 +60,8 @@ bool VESC_convertMuxStatusToRaw(VESC_RawFrame* out, const VESC_Mux_Status* in);
 
 bool VESC_convertStatus11ToRaw(VESC_RawFrame* out, const VESC_Status_11* in);
 
+bool VESC_convertStatus12ToRaw(VESC_RawFrame* out, const VESC_Status_12* in);
+
 
 //****
 // from VESC_RawFrame
@@ -94,5 +96,7 @@ bool VESC_convertRawToMuxCamSel(VESC_Mux_CamSel* out, const VESC_RawFrame* in);
 bool VESC_convertRawToMuxStatus(VESC_Mux_Status* out, const VESC_RawFrame* in);
 
 bool VESC_convertRawToStatus11(VESC_Status_11* out, const VESC_RawFrame* in);
+
+bool VESC_convertRawToStatus12(VESC_Status_12* out, const VESC_RawFrame* in);
 
 #endif //VESC_Convert_h_

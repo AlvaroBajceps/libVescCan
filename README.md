@@ -117,7 +117,7 @@ Status frames are sent continously by design. Each VESC CAN-Bus device can send 
 > To receive motor status (RPM, Voltage, Current etc.) status commands have to be activated.  
 > Using two rates is useful for not congesting the bus with messages that are not needed as often, which can be sent at a lower rate.  
 
-There are 10 different status messages available with the following data:
+There are 12 numbered status messages, plus the MUX frames listed below:
 
 > Note:  
 > Availability states VESC CAN-Bus devices capable of sending given type of status.  
@@ -138,6 +138,7 @@ There are 10 different status messages available with the following data:
 | VESC_COMMAND_MUX_CAMSEL | 34 | CameraSelect | N/A |
 | VESC_COMMAND_MUX_STATUS | 35 | Settings.State, Settings.Mode, VtxConfig.Power, VtxConfig.Band, VtxConfig.Channel, Camera Select, Temp VTX, Temp Board | N/A |
 | VESC_COMMAND_STATUS_11 | 41 | Cubemars status | Cubemars |
+| VESC_COMMAND_STATUS_12 | 42 | Orientation quaternion (W, X, Y, Z) | IMU |
 
 The content of the status messages is encoded as follows:
 
@@ -264,6 +265,47 @@ The content of the status messages is encoded as follows:
 | B4 - B5 | Current | A | 100 | Cubemars |
 | B6 | Motor Temp | DegC | 1 | Cubemars |
 | B7 | Error Code | `VESC_Status_11_ErrorCode` | N/A | Cubemars |
+
+#### **VESC_COMMAND_STATUS_12**
+
+Custom IMU status frame, command ID **42** (`0x2A`), DLC **8**.
+Each component is a signed 16-bit **big-endian** integer (MSB first), in **W, X, Y, Z** order.
+
+| **Byte** | **Data** | **Unit** | **Scale** | **Availability** |
+|------|------|------|-------|---------|
+| B0 - B1 | Quaternion W (`int16_t`) | Dimensionless | 32767 | IMU |
+| B2 - B3 | Quaternion X (`int16_t`) | Dimensionless | 32767 | IMU |
+| B4 - B5 | Quaternion Y (`int16_t`) | Dimensionless | 32767 | IMU |
+| B6 - B7 | Quaternion Z (`int16_t`) | Dimensionless | 32767 | IMU |
+
+`VESC_Status_12` holds unscaled `float` fields `w`, `x`, `y`, `z` and `vescID`,
+like the other status structures. Use `VESC_convertStatus12ToRaw()` before sending
+and `VESC_convertRawToStatus12()` after receiving.
+Encoding multiplies each component by 32767 and rounds to the nearest integer
+(ties away from zero); decoding divides by 32767.
+Normalize the quaternion before encoding. The encoder rejects null pointers,
+non-finite components and components outside [-1, 1]; it does not normalize.
+The decoder rejects null pointers, an incorrect command or a DLC other than 8;
+it does not validate the quaternion norm. Normalize after decoding for rotation calculations.
+
+For compatibility with `VescGyro/tools/can_orientation.py`, use a right-handed
+Hamilton quaternion describing body-to-world rotation. Use `--conjugate` in the
+visualizer if your filter produces world-to-body rotation instead.
+The extended arbitration ID is `(42 << 8) | vescID`, not just 42.
+For device ID 1, identity orientation `(1, 0, 0, 0)` is:
+
+| **Extended ID** | **B0** | **B1** | **B2** | **B3** | **B4** | **B5** | **B6** | **B7** |
+|------|------|------|------|------|------|------|------|------|
+| 0x2A01 | 0x7F | 0xFF | 0x00 | 0x00 | 0x00 | 0x00 | 0x00 | 0x00 |
+
+Run the visualizer from the VescGyro repository with `--extended --big-endian`:
+
+```powershell
+python tools/can_orientation.py --interface slcan --channel COM5 --can-id 0x2A01 --extended --big-endian --bitrate 500000
+```
+
+Replace the adapter backend/channel and device ID as needed. ID 42 is a custom
+assignment in this library, not a guarantee of compatibility with other VESC firmware variants.
 
 #### **VESC_COMMAND_MUX_CONFIG_1**
 

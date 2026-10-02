@@ -287,7 +287,22 @@ bool VESC_convertStatus11ToRaw(VESC_RawFrame* out, const VESC_Status_11* in)
 	return true;
 }
 
+bool VESC_convertStatus12ToRaw(VESC_RawFrame* out, const VESC_Status_12* in)
+{
+	if (out == NULL || in == NULL)
+		return false;
 
+	out->vescID = in->vescID;
+	out->command = VESC_COMMAND_STATUS_12;
+	out->_reserved = VESC_CAN_EXTID_FLAG;
+	out->can_dlc = VESC_CAN_STATUS_12_DLEN;
+
+	_VESC_WriteRawData16(out, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_W], in->w, VESC_SCALE_STATUS_12_W);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_X], in->x, VESC_SCALE_STATUS_12_X);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_Y], in->y, VESC_SCALE_STATUS_12_Y);
+	_VESC_WriteRawData16(out, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_Z], in->z, VESC_SCALE_STATUS_12_Z);
+	return true;
+}
 
 bool VESC_convertRawToCmd(VESC_CommandFrame* out, const VESC_RawFrame* in)
 {
@@ -558,5 +573,20 @@ bool VESC_convertRawToStatus11(VESC_Status_11* out, const VESC_RawFrame* in)
 	_VESC_ReadRawData8(out->motorTemp, in, _VESC_offset_Status_11[_VESC_OFFSETIDX_STATUS_11_MOTORTEMP], VESC_SCALE_STATUS_11_MOTORTEMP,/*none*/);
 	_VESC_ReadRawData8u(out->errorCode, in, _VESC_offset_Status_11[_VESC_OFFSETIDX_STATUS_11_ERRORCODE], VESC_SCALE_STATUS_11_ERRORCODE, (VESC_Status_11_ErrorCode));
 
+	return true;
+}
+
+bool VESC_convertRawToStatus12(VESC_Status_12* out, const VESC_RawFrame* in)
+{
+	if (out == NULL || in == NULL || in->command != VESC_COMMAND_STATUS_12 ||
+		in->can_dlc != VESC_CAN_STATUS_12_DLEN)
+		return false;
+
+	out->vescID = in->vescID;
+
+	_VESC_ReadRawData16(out->x, in, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_X], VESC_SCALE_STATUS_12_X,/*none*/);
+	_VESC_ReadRawData16(out->y, in, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_Y], VESC_SCALE_STATUS_12_Y,/*none*/);
+	_VESC_ReadRawData16(out->z, in, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_Z], VESC_SCALE_STATUS_12_Z,/*none*/);
+	_VESC_ReadRawData16(out->w, in, _VESC_offset_Status_12[_VESC_OFFSETIDX_STATUS_12_W], VESC_SCALE_STATUS_12_W,/*none*/);
 	return true;
 }
