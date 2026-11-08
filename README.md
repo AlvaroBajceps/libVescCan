@@ -1,10 +1,12 @@
 # VESC CAN-Bus Communication
 
-Modified for our ([Raptors PŁ](https://raptors.p.lodz.pl/)) needs  
+Modified for our ([Raptors PL](https://raptors.p.lodz.pl/)) needs<br>
 Original document can be found [here](https://github.com/vedderb/bldc/blob/master/documentation/comm_can.md).  
 Original document regarding Cubemars - [cubemars manual](https://www.cubemars.com/images/file/20240611/1718085712815162.pdf) 
 
 ## Timeout
+
+The motor-command timeout below is separate from the device-configuration behaviour described under SET_CONFIG.
 
 By default there is a timeout that stops the motor when nothing has been received on the CAN-bus for more than 0.5 seconds. The timeout value can be changed. Setting it to 0 disables the timeout, but it is strongly recommended to not disable it in case something goes wrong with the communication link.  
 
@@ -59,17 +61,19 @@ For a full and precise description of the protocol it is best to look at the sou
 
 ### Frame Format
 
-The VESC CAN-frames all use 29-bit extended IDs. The ID of the receiver as well as the command ID is embedded in the extended ID of the CAN-frame as:
+The VESC CAN-frames use 29-bit extended IDs. The command ID and device ID are embedded in the extended ID as:
 
 | **B28 - B16** | **B15 - B8** | **B7 - B0** |
 |-----------|----------|---------|
 | Unused | Command ID | VESC ID |
 
-The data bytes in the CAN-frame depend on the command.
+The identifier is `(command ID << 8) | device ID`. For commands, the device ID identifies the receiver; for status, it identifies the publisher or battery slot. Multi-byte integers are big-endian unless stated otherwise. Bit 0 is the least-significant bit.
+
+Payload length and format depend on the command and device.
 
 ### Command (simple) Frames
 
-All simple CAN-commands have 4 data bytes which represent the argument for the commands as a 32-bit big endian signed number with scaling.  
+Scalar motor commands carry a 32-bit big-endian signed argument with scaling. Commands with dedicated payloads, including SET_POS_SPEED_LOOP, MUX_CAMSEL, and SET_CONFIG, use the layouts below.
 
 > Example:   
 > The command VESC_COMMAND_SET_CURRENT has command id 1 and scaling 1000. The CAN-frame for setting the current to 51 A on VESC ID 23 would look like the following:  
@@ -96,6 +100,8 @@ The following simple commands are available:
 | VESC_COMMAND_SET_CURRENT_BRAKE_REL | 11 | 100000 | % / 100 |  | \-1.0 to 1.0 | BLDC |
 | VESC_COMMAND_SET_CURRENT_HANDBRAKE | 12 | 1000 | A |  | \-MOTOR_MAX to MOTOR_MAX | BLDC |
 | VESC_COMMAND_SET_CURRENT_HANDBRAKE_REL | 13 | 100000 | % / 100 |  | \-1.0 to 1.0 | BLDC |
+| VESC_COMMAND_SET_CONFIG | 103 / 0x67 | N/A | N/A | Two device-specific configuration bytes | DLC 2 | [Profiles](#vesc_command_set_config) |
+| VESC_COMMAND_MUX_CAMSEL | 34 | N/A | Camera number | CameraSelect | N/A | Analog MUX |
 
 > \* VESC_COMMAND_SET_POS for Cubemars is supported but not scaled correctly. Apply 1/100 of value to Cubemars. (Details in #10)
 
@@ -109,15 +115,172 @@ Well, this one isn't that simple..
 | B4 - B5 | Speed | ERPM | 0.1 | Cubemars |
 | B6 - B7 | Acceleration | ERPM/s² | 0.1 | Cubemars |
 
+#### **VESC_COMMAND_MUX_CAMSEL**
+
+<table>
+  <thead>
+    <tr>
+      <th>Byte</th>
+      <th>Data</th>
+      <th>Unit</th>
+      <th>Scale</th>
+      <th>Availability</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>B0</td>
+      <td>CameraSelect</td>
+      <td>Number</td>
+      <td>1</td>
+      <td>N/A</td>
+    </tr>
+  </tbody>
+</table>
+
+#### **VESC_COMMAND_SET_CONFIG**
+
+Device-specific configuration. Payload length: **2 bytes**.
+
+The latest valid settings from any supported interface remain active without a timeout. Reset behaviour is device-specific.
+
+##### **HotSwap**
+
+Receiver: **0x92**. CAN ID: **0x6792**.
+
+<table>
+  <thead>
+    <tr>
+      <th>Byte</th>
+      <th>Data</th>
+      <th>Unit</th>
+      <th>Scale</th>
+      <th>Availability</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>B0</td>
+      <td>Control bits
+        <details>
+          <summary>Bit-map</summary>
+          <ul>
+            <li>b0 -> left_HS</li>
+            <li>b1 -> center_HS</li>
+            <li>b2 -> right_HS</li>
+            <li>b3 -> AUTO</li>
+            <li>b4 -> GPIO1 / S2 output level, if configured as output</li>
+            <li>b5 -> resetLeftBattery</li>
+            <li>b6 -> resetCenterBattery</li>
+            <li>b7 -> resetRightBattery</li>
+          </ul>
+        </details>
+      </td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>Hotswap</td>
+    </tr>
+    <tr>
+      <td>B1</td>
+      <td>eFuse enable (future): 0 = OFF, 1 = ON</td>
+      <td>Boolean</td>
+      <td>1</td>
+      <td>Hotswap</td>
+    </tr>
+  </tbody>
+</table>
+
+With resistors: AUTO ignores manual HS bits; manual mode bypasses automatic battery checks. Without resistors, all HS remain enabled and individual switching is blocked.
+
+B0 bits 0–4 and B1 set the complete desired state; zero means OFF/LOW.
+
+GPIO1 and battery-reset requests are independent of AUTO.
+
+Battery reset bits request one Device Reset (`0x0041`) attempt on a 0→1 edge; send zero to rearm. Fault clearance is not guaranteed.
+
+On reset hotswap should start in automatic mode if resistors are present, if not start in all HS enabled (tournament mode).
+
+##### **Analog MUX**
+
+Receiver: **0xA0**. CAN ID: **0x67A0**.
+
+<table>
+  <thead>
+    <tr>
+      <th>Byte</th>
+      <th>Data</th>
+      <th>Unit</th>
+      <th>Scale</th>
+      <th>Availability</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>B0</td>
+      <td>Settings
+        <details>
+          <summary>Bit-map</summary>
+          <ul>
+            <li>b0   -> state (powers state of cameras, disables vtx when 0; on when 1)</li>
+            <li>b1-2 -> mode
+              <ul>
+                <li>[0b00] - all off</li>
+                <li>[0b01] - selected on</li>
+                <li>[0b10] - neighbours on</li>
+                <li>[0b11] - all on</li>
+              </ul>
+              </li>
+            <li>b3-7 -> reserved</li>
+          </ul>
+        </details>
+      </td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>B1</td>
+      <td>VTX Config
+        <details>
+            <summary>Bit-map</summary>
+            <ul>
+              <li>b0-1 -> power
+                <ul>
+                  <li>[0b00] - 25 mW</li>
+                  <li>[0b01] - 200 mW</li>
+                  <li>[0b10] - 400 mW</li>
+                  <li>[0b11] - 800 mW</li>
+                </ul>
+              </li>
+              <li>b2-3 -> band
+                <ul>
+                  <li>[0b00] - A</li>
+                  <li>[0b01] - B</li>
+                  <li>[0b10] - F</li>
+                  <li>[0b11] - R</li>
+                </ul>
+              </li>
+              <li>b4-6 -> channel (0-7; depends on band)</li>
+              <li>b7   -> reserved</li>
+            </ul>
+        </details>
+      </td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+  </tbody>
+</table>
+
 ### Status Frames
 
-Status frames are sent continously by design. Each VESC CAN-Bus device can send any number of status frames at any (preferably constant) rate
+Devices publish supported status frames periodically at suitable rates. HotSwap battery STATUS_9 is sent only for valid, fresh, in-range data; board status is scheduled independently of battery availability.
 
 > Note for BLDC:  
 > To receive motor status (RPM, Voltage, Current etc.) status commands have to be activated.  
 > Using two rates is useful for not congesting the bus with messages that are not needed as often, which can be sent at a lower rate.  
 
-There are 12 numbered status messages, plus the MUX frames listed below:
+There are 13 numbered status messages, plus MUX_STATUS and HEARTBEAT_STATUS:
 
 > Note:  
 > Availability states VESC CAN-Bus devices capable of sending given type of status.  
@@ -132,13 +295,13 @@ There are 12 numbered status messages, plus the MUX frames listed below:
 | VESC_COMMAND_STATUS_6 | 28 | ADC1, ADC2, ADC3, PPM | BLDC |
 | VESC_COMMAND_STATUS_7 | 29 | Precise Position | Stepper |
 | VESC_COMMAND_STATUS_8 | 30 | WeightA, WeightB, WeightC, Ph, Distance | Probe |
-| VESC_COMMAND_STATUS_9 | 31 | Voltage, Current, Temperature, Charge, Status | Hotswap |
+| VESC_COMMAND_STATUS_9 | 31 | Voltage, SOC, Current, Temperature, Minutes to target, Battery Status, Safety/PF | HotSwap |
 | VESC_COMMAND_STATUS_10 | 32 | MCU States | ROS (ros-core) |
-| VESC_COMMAND_MUX_CONFIG_1 | 33 | Settings.State, Settings.Mode, VtxConfig.Power, VtxConfig.Band, VtxConfig.Channel | N/A |
-| VESC_COMMAND_MUX_CAMSEL | 34 | CameraSelect | N/A |
-| VESC_COMMAND_MUX_STATUS | 35 | Settings.State, Settings.Mode, VtxConfig.Power, VtxConfig.Band, VtxConfig.Channel, Camera Select, Temp VTX, Temp Board | N/A |
 | VESC_COMMAND_STATUS_11 | 41 | Cubemars status | Cubemars |
 | VESC_COMMAND_STATUS_12 | 42 | Orientation quaternion (W, X, Y, Z) | IMU |
+| VESC_COMMAND_STATUS_13 | 43 / 0x2B | Eight device-specific status bytes | [HotSwap profile](#hotswap-status_13) |
+| VESC_COMMAND_MUX_STATUS | 35 | Settings.State, Settings.Mode, VtxConfig.Power, VtxConfig.Band, VtxConfig.Channel, Camera Select, Temp VTX, Temp Board | Analog MUX |
+| VESC_COMMAND_HEARTBEAT_STATUS | 235 / 0xEB | Shared health/reset header and one device-specific byte | [Profiles](#vesc_command_heartbeat_status) |
 
 The content of the status messages is encoded as follows:
 
@@ -198,14 +361,123 @@ The content of the status messages is encoded as follows:
 
 #### **VESC_COMMAND_STATUS_9**
 
-| **Byte** | **Data**                                               | **Unit**   | **Scale**    | **Range**         | **Availability**     |
-|----------|--------------------------------------------------------|------------|--------------|-------------------|----------------------|
-| B0 - B1  | Voltage                                                | V          | 1000         | 0:65.5 V          | Hotswap              |
-| B2 - B3  | Current ( `+` &larr; charging, `–` &larr; discharging) | A          | 1000         | -32.768:32.767 A  | Hotswap              |
-| B4       | Temperature                                            | deg C      | 1            | -128:127 deg C    | Hotswap              |
-| B5       | Charge                                                 | %          | 1            | 0:100 %           | Hotswap              |
-| B6       | Battery Status                                         | ENUM       | N/A          | N/A               | Hotswap              |
-| B7       | Hotswap Status (hotswap master control): <br/><ul><li>b0 -> `hotswap_master` </li><li>b1 -> `hotswap_slaveA`</li><li>b2 -> `hotswap_slaveB`</li><li>b3 -> `drive_stop`</li><li>b4 -> `hotswap_gpio1`</li><li>b5 -> `hotswap_gpio2`</li><li>b6 -> `hotswap_gpio3`</li><li>b7 -> `hotswap_gpio4`</li></ul> | N/A         | N/A       | N/A            | Hotswap              |
+Payload: **8 bytes**. Slot IDs (CAN IDs): left **0x90 (0x1F90)**, center **0x91 (0x1F91)**, right **0x92 (0x1F92)**.
+<table>
+  <thead>
+    <tr>
+      <th>Byte</th>
+      <th>Data</th>
+      <th>Unit</th>
+      <th>Scale</th>
+      <th>Range</th>
+      <th>Availability</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>B0</td>
+      <td>Voltage</td>
+      <td>V</td>
+      <td>10</td>
+      <td>0–25.5 V</td>
+      <td>Hotswap</td>
+    </tr>
+    <tr>
+      <td>B1</td>
+      <td>SOC</td>
+      <td>%</td>
+      <td>1</td>
+      <td>0–100%</td>
+      <td>Hotswap</td>
+    </tr>
+    <tr>
+      <td>B2–B3</td>
+      <td>Current (+ charging, − discharging)</td>
+      <td>A</td>
+      <td>1000</td>
+      <td>−32.768 to +32.767 A</td>
+      <td>Hotswap</td>
+    </tr>
+    <tr>
+      <td>B4</td>
+      <td>Temperature</td>
+      <td>°C</td>
+      <td>1</td>
+      <td>−128 to +127 °C</td>
+      <td>Hotswap</td>
+    </tr>
+    <tr>
+      <td>B5</td>
+      <td>Minutes to target
+        <details>
+          <summary>Values</summary>
+          <ul>
+            <li>0–253 -> minutes remaining</li>
+            <li>254 -> at least 254 minutes</li>
+            <li>255 -> unavailable</li>
+          </ul>
+        </details>
+      </td>
+      <td>min</td>
+      <td>1</td>
+      <td>0–255</td>
+      <td>Hotswap</td>
+    </tr>
+    <tr>
+      <td>B6</td>
+      <td>Battery Status
+        <details>
+          <summary>Bit-map</summary>
+          <ul>
+            <li>b0 -> FD: fully discharged</li>
+            <li>b1 -> FC: fully charged</li>
+            <li>b2 -> DSG: discharging or resting</li>
+            <li>b3 -> LOW_REMAINING: RCA or RTA</li>
+            <li>b4 -> TCA: terminate charge alarm</li>
+            <li>b5 -> TDA: terminate discharge alarm</li>
+            <li>b6 -> OTA: overtemperature alarm</li>
+            <li>b7 -> OCA: overcharged alarm</li>
+          </ul>
+        </details>
+      </td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>Hotswap</td>
+    </tr>
+    <tr>
+      <td>B7</td>
+      <td>Safety/PF Status
+        <details>
+          <summary>Bit-map</summary>
+          <ul>
+            <li>b0 -> Undervoltage: CUV, CUVC</li>
+            <li>b1 -> Overvoltage: COV, COVL, CHGV</li>
+            <li>b2 -> Discharge overcurrent/overload: OCD1, OCD2, OCDL, AOLD, AOLDL</li>
+            <li>b3 -> Charge overcurrent: OCC1, OCC2, CHGC, PCHGC</li>
+            <li>b4 -> Short circuit: ASCC, ASCCL, ASCD, ASCDL</li>
+            <li>b5 -> Temperature fault: OTC, OTD, OTF, UTC, UTD</li>
+            <li>b6 -> Charging-process fault: OC, PTO, CTO</li>
+            <li>b7 -> Permanent failure: OperationStatus.PF, bit 12</li>
+          </ul>
+        </details>
+      </td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>Hotswap</td>
+    </tr>
+  </tbody>
+</table>
+
+Current: signed 16-bit big-endian. Temperature: signed 8-bit. Round voltage to 0.1 V and current to 1 mA; truncate temperature and SOC. Reject non-finite or out-of-range inputs.
+
+B5 reports time to empty when DSG is set (including rest), otherwise time to full. Gauge `0xFFFF` maps to 255; finite estimates ≥254 minutes map to 254.
+
+Status bits may coexist; safety groups OR their listed flags.
+
+Send only valid, fresh, in-range data. Fault flags and unavailable time do not invalidate a sample. Receivers time out each battery independently; board frames do not refresh battery data.
+
 
 #### **VESC_COMMAND_STATUS_10**
 > Note:  
@@ -275,8 +547,13 @@ The content of the status messages is encoded as follows:
 | B4 - B5 | Quaternion Y (`int16_t`) | Dimensionless | 32767 | IMU |
 | B6 - B7 | Quaternion Z (`int16_t`) | Dimensionless | 32767 | IMU |
 
-#### **VESC_COMMAND_MUX_CONFIG_1**
+#### **VESC_COMMAND_STATUS_13**
 
+Device-specific status. Payload length: **8 bytes**.
+
+##### **HotSwap STATUS_13**
+
+Source: **0x92**. CAN ID: **0x2B92**. Sent once per second, independently of battery data.
 <table>
   <thead>
     <tr>
@@ -284,95 +561,135 @@ The content of the status messages is encoded as follows:
       <th>Data</th>
       <th>Unit</th>
       <th>Scale</th>
+      <th>Range</th>
       <th>Availability</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>B0</td>
-      <td>Settings
+      <td>Hotswap Status
         <details>
           <summary>Bit-map</summary>
           <ul>
-            <li>b0   -> state (powers state of cameras, disables vtx when 0; on when 1)</li>
-            <li>b1-2 -> mode 
-              <ul>
-                <li>[0b00] - all off</li>
-                <li>[0b01] - selected on</li>
-                <li>[0b10] - neighbours on</li>
-                <li>[0b11] - all on</li>
-              </ul>
-              see <code>VESC_Mux_Config_1_Mode</code>
-              </li>
-            <li>b3-7 -> reserved</li>
+            <li>b0 -> left_HS enabled</li>
+            <li>b1 -> center_HS enabled</li>
+            <li>b2 -> right_HS enabled</li>
+            <li>b3 -> AUTO active</li>
+            <li>b4 -> S1 signal level (0 = LOW, 1 = HIGH)</li>
+            <li>b5 -> GPIO1 / S2 signal level (0 = LOW, 1 = HIGH)</li>
+            <li>b6 -> RESISTORS_PRESENT (0 = absent, 1 = present)</li>
+            <li>b7 -> EFUSE_PRESENT (0 = absent, 1 = present)</li>
           </ul>
         </details>
       </td>
       <td>N/A</td>
       <td>N/A</td>
       <td>N/A</td>
+      <td>Hotswap</td>
     </tr>
     <tr>
       <td>B1</td>
-      <td>VTX Config
-        <details>
-            <summary>Bit-map</summary>
-            <ul>
-              <li>b0-1 -> power
-                <ul>
-                  <li>[0b00] - 25 mW</li>
-                  <li>[0b01] - 200 mW</li>
-                  <li>[0b10] - 400 mW</li>
-                  <li>[0b11] - 800 mW</li>
-                </ul>
-                see <code>VESC_Mux_Config_1_Power</code>
-              </li>
-              <li>b2-3 -> band
-                <ul>
-                  <li>[0b00] - A</li>
-                  <li>[0b01] - B</li>
-                  <li>[0b10] - F</li>
-                  <li>[0b11] - R</li>
-                </ul>
-                see <code>VESC_Mux_Config_1_Band</code>
-              </li>
-              <li>b4-6 -> channel (0-7; depends on band)</li>
-              <li>b7   -> reserved</li>
-            </ul>
-        </details>
-      </td>
-      <td>N/A</td>
-      <td>N/A</td>
-      <td>N/A</td>
+      <td>eFuse Status (future)</td>
+      <td>TBD</td>
+      <td>TBD</td>
+      <td>TBD</td>
+      <td>Hotswap</td>
     </tr>
-  </tbody>
-</table>
-
-#### **VESC_COMMAND_MUX_CAMSEL**
-
-<table>
-  <thead>
     <tr>
-      <th>Byte</th>
-      <th>Data</th>
-      <th>Unit</th>
-      <th>Scale</th>
-      <th>Availability</th>
+      <td>B2</td>
+      <td>Resistor Temperature, if present</td>
+      <td>TBD</td>
+      <td>TBD</td>
+      <td>TBD</td>
+      <td>Hotswap</td>
     </tr>
-  </thead>
-  <tbody>
     <tr>
-      <td>B0</td>
-      <td>CameraSelect</td>
+      <td>B3</td>
+      <td>Left Battery Number</td>
       <td>Number</td>
       <td>1</td>
+      <td>1–15; 255 = unavailable</td>
+      <td>Hotswap</td>
+    </tr>
+    <tr>
+      <td>B4</td>
+      <td>Center Battery Number</td>
+      <td>Number</td>
+      <td>1</td>
+      <td>1–15; 255 = unavailable</td>
+      <td>Hotswap</td>
+    </tr>
+    <tr>
+      <td>B5</td>
+      <td>Right Battery Number</td>
+      <td>Number</td>
+      <td>1</td>
+      <td>1–15; 255 = unavailable</td>
+      <td>Hotswap</td>
+    </tr>
+    <tr>
+      <td>B6</td>
+      <td>Controller state (low nibble), left-battery state (high nibble)</td>
+      <td>Enums below</td>
       <td>N/A</td>
+      <td>Two 4-bit codes</td>
+      <td>Hotswap</td>
+    </tr>
+    <tr>
+      <td>B7</td>
+      <td>Center-battery state (low nibble), right-battery state (high nibble)</td>
+      <td>Enums below</td>
+      <td>N/A</td>
+      <td>Two 4-bit codes</td>
+      <td>Hotswap</td>
     </tr>
   </tbody>
 </table>
+
+HS bits report applied enable outputs. Resistor/eFuse presence is captured at startup from S3/I2C1. eFuse status and resistor-temperature encodings remain TBD.
+
+Battery numbers identify physical packs; 0 is reserved.
+
+State bit-map:
+
+| Bits | Field |
+|---|---|
+| B6 bits 0–3 | Controller state |
+| B6 bits 4–7 | Left-battery state |
+| B7 bits 0–3 | Center-battery state |
+| B7 bits 4–7 | Right-battery state |
+
+| Controller code | Meaning |
+|---|---|
+| 0 | INIT |
+| 1 | FIXED_ALL_ON |
+| 2 | MANUAL |
+| 3 | AUTO_PRECHARGE |
+| 4 | AUTO_RUNNING |
+| 5 | AUTO_NO_ELIGIBLE |
+| 6–15 | Reserved |
+
+| Battery code | Meaning |
+|---|---|
+| 0 | UNKNOWN_NOT_ASSESSED |
+| 1 | UNAVAILABLE |
+| 2 | QUALIFYING |
+| 3 | ELIGIBLE |
+| 4 | WAITING_FOR_IDLE_CURRENT |
+| 5 | WAITING_FOR_VOLTAGE |
+| 6 | CONNECTED |
+| 7 | FAULTED |
+| 8–15 | Reserved |
+
+States describe controller assessment; B0 reports HS outputs. ELIGIBLE means qualified, fresh and fault-free; current/voltage admission checks still apply.
+
+Both are subject to change.
 
 #### **VESC_COMMAND_MUX_STATUS**
 
+Command **35 / 0x23**, DLC **7**. Its Settings and VTX Config bytes retain the Analog MUX profile layout.
+
 <table>
   <thead>
     <tr>
@@ -385,8 +702,8 @@ The content of the status messages is encoded as follows:
   </thead>
   <tbody>
     <tr>
-      <td>B0 - B1</td>
-      <td>see <code>VESC_COMMAND_MUX_CONFIG_1</code></td>
+      <td>B0-B1</td>
+      <td>See the <a href=#analog-mux>SET_CONFIG Analog MUX profile</a> Settings and VTX Config bytes</td>
       <td>N/A</td>
       <td>N/A</td>
       <td>N/A</td>
@@ -415,7 +732,39 @@ The content of the status messages is encoded as follows:
   </tbody>
 </table>
 
+#### **VESC_COMMAND_HEARTBEAT_STATUS**
+
+Payload length: **2 bytes**. B0 contains common status; B1 is device-specific.
+
+| B0 bits | Meaning |
+|---|---|
+| 0 | OK |
+| 1 | WARN |
+| 2 | ERR |
+| 3 | SPI_ERR |
+| 4 | I2C_ERR |
+| 5–7 | Latest reset-reason code |
+
+Flags b0–b4 are independent.
+
+| Reset code | Meaning |
+|---|---|
+| 0 | NO_RESET |
+| 1 | WATCHDOG |
+| 2 | BROWNOUT |
+| 3 | SOFTWARE |
+| 4 | NRST_PIN |
+| 5–7 | Reserved |
+
+Reports the latest reset cause; full power-off clears the record.
+
+##### **HotSwap heartbeat**
+
+Source: **0x92**. CAN ID: **0xEB92**. B1 uses the [HotSwap status byte](#hotswap-status_13).
+
+Sent independently of battery data. Board heartbeat does not refresh battery timestamps.
+
 ## Frequently Asked Questions (FAQ)
 
-**What happens when sending commands outside of range?**
+**What happens when sending motor commands outside of range?**
 - When sending commands outside of range they will be truncated at the range limit. For example, if the maximum braking current is set to 50A and VESC_COMMAND_SET_CURRENT_BRAKE is sent with 60A the value will be truncated and 50A will be used.

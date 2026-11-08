@@ -1,7 +1,7 @@
 #ifndef VESC_Structs_h_
 #define VESC_Structs_h_
 
-#include <libVescCan/VESC_Mux_Config_1_Consts.h>
+#include <libVescCan/VESC_Mux_Consts.h>
 #include <libVescCan/VESC_Defines.h>
 #include <libVescCan/VESC_Consts.h>
 #include <libVescCan/VESC_Status_10_Consts.h>
@@ -69,6 +69,13 @@ typedef struct _VESC_CommandFrame
 		uint8_t _commandDataRaw[12];
 	};
 } VESC_CommandFrame;
+
+/* Generic SET_CONFIG payload. The addressed device defines both bytes. */
+typedef struct _VESC_SetConfig
+{
+    VESC_Id_t vescID;
+    uint8_t data[VESC_CAN_SET_CONFIG_DLEN];
+} VESC_SetConfig;
 
 
 /// <summary>
@@ -173,12 +180,13 @@ typedef struct _VESC_Status_8
 typedef struct _VESC_Status_9
 {
     VESC_Id_t vescID;
-    float voltage;
-    float current;
-    float temperature;
-	float charge;
+    float voltage;       /* V, 0..25.5, nearest 0.1 V on wire. */
+    float current;       /* A, -32.768..32.767; positive means charging. */
+    float temperature;   /* Celsius, -128..127, truncated to whole degrees. */
+	float charge;        /* SOC percent, 0..100. */
+	uint8_t minutesToTarget; /* 0..253; 254 = >=254 min; 255 = unavailable. */
 	uint8_t batteryStatus;
-	uint8_t hotswapStatus;
+	uint8_t safetyStatus;
 } VESC_Status_9;
 
 /// <summary>
@@ -221,25 +229,19 @@ typedef struct _VESC_Status_12
     float z;
 } VESC_Status_12;
 
-/// <summary>
-/// Mux Config 1 frame (note: camera/mux frame)
-/// Convert to VESC_RawFrame before sending!
-/// </summary>
-typedef struct _VESC_Mux_Config_1
+/* Generic eight-byte status. The publishing device defines the byte meanings. */
+typedef struct _VESC_Status_13
 {
     VESC_Id_t vescID;
-    struct {
-        bool state;
-        VESC_Mux_Config_1_Mode mode;
-        uint8_t _reserved;
-    } settings;
-    struct {
-        VESC_Mux_Config_1_Power power;
-        VESC_Mux_Config_1_Band band;
-        uint8_t channel;
-        uint8_t _reserved;
-    } vtxConfig;
-} VESC_Mux_Config_1;
+    uint8_t data[VESC_CAN_STATUS_13_DLEN];
+} VESC_Status_13;
+
+/* B0 is the common heartbeat header; B1 is device-specific. */
+typedef struct _VESC_Heartbeat_Status
+{
+    VESC_Id_t vescID;
+    uint8_t data[VESC_CAN_HEARTBEAT_STATUS_DLEN];
+} VESC_Heartbeat_Status;
 
 /// <summary>
 /// Mux CamSelect frame (note: camera/mux frame)
@@ -260,12 +262,12 @@ typedef struct _VESC_Mux_Status
     VESC_Id_t vescID;
     struct {
         bool state;
-        VESC_Mux_Config_1_Mode mode;
+        VESC_Mux_Mode mode;
         uint8_t _reserved;
     } settings;
     struct {
-        VESC_Mux_Config_1_Power power;
-        VESC_Mux_Config_1_Band band;
+        VESC_Mux_Power power;
+        VESC_Mux_Band band;
         uint8_t channel;
         uint8_t _reserved;
     } vtxConfig;
@@ -277,21 +279,6 @@ typedef struct _VESC_Mux_Status
 //****
 // internal structs
 //****
-
-typedef struct _VESC_CAN_Mux_Config_1_settings
-{
-    uint8_t state : 1;
-    uint8_t mode : 2;
-    uint8_t reserved : 5;
-} VESC_CAN_Mux_Config_1_settings ;
-
-typedef struct _VESC_CAN_Mux_Config_1_vtxConfig
-{
-    uint8_t power : 2;
-    uint8_t band : 2;
-    uint8_t channel : 3;
-    uint8_t reserved : 1;
-} VESC_CAN_Mux_Config_1_vtxConfig ;
 
 typedef struct _VESC_CAN_Mux_Status_settings
 {
