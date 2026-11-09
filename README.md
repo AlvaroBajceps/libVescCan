@@ -100,7 +100,7 @@ The following simple commands are available:
 | VESC_COMMAND_SET_CURRENT_BRAKE_REL | 11 | 100000 | % / 100 |  | \-1.0 to 1.0 | BLDC |
 | VESC_COMMAND_SET_CURRENT_HANDBRAKE | 12 | 1000 | A |  | \-MOTOR_MAX to MOTOR_MAX | BLDC |
 | VESC_COMMAND_SET_CURRENT_HANDBRAKE_REL | 13 | 100000 | % / 100 |  | \-1.0 to 1.0 | BLDC |
-| VESC_COMMAND_SET_CONFIG | 103 / 0x67 | N/A | N/A | Two device-specific configuration bytes | DLC 2 | [Profiles](#vesc_command_set_config) |
+| VESC_COMMAND_SET_CONFIG | 103 | N/A | N/A | Two device-specific configuration bytes | DLC 2 | [Profiles](#vesc_command_set_config) |
 | VESC_COMMAND_MUX_CAMSEL | 34 | N/A | Camera number | CameraSelect | N/A | Analog MUX |
 
 > \* VESC_COMMAND_SET_POS for Cubemars is supported but not scaled correctly. Apply 1/100 of value to Cubemars. (Details in #10)
@@ -299,9 +299,9 @@ There are 13 numbered status messages, plus MUX_STATUS and HEARTBEAT_STATUS:
 | VESC_COMMAND_STATUS_10 | 32 | MCU States | ROS (ros-core) |
 | VESC_COMMAND_STATUS_11 | 41 | Cubemars status | Cubemars |
 | VESC_COMMAND_STATUS_12 | 42 | Orientation quaternion (W, X, Y, Z) | IMU |
-| VESC_COMMAND_STATUS_13 | 43 / 0x2B | Eight device-specific status bytes | [HotSwap profile](#hotswap-status_13) |
+| VESC_COMMAND_STATUS_13 | 43 | Eight device-specific status bytes | [HotSwap profile](#hotswap-status_13) |
 | VESC_COMMAND_MUX_STATUS | 35 | Settings.State, Settings.Mode, VtxConfig.Power, VtxConfig.Band, VtxConfig.Channel, Camera Select, Temp VTX, Temp Board | Analog MUX |
-| VESC_COMMAND_HEARTBEAT_STATUS | 235 / 0xEB | Shared health/reset header and one device-specific byte | [Profiles](#vesc_command_heartbeat_status) |
+| VESC_COMMAND_HEARTBEAT_STATUS | 235 | Shared health/reset header and one device-specific byte | [Profiles](#vesc_command_heartbeat_status) |
 
 The content of the status messages is encoded as follows:
 
