@@ -73,7 +73,7 @@ Payload length and format depend on the command and device.
 
 ### Command (simple) Frames
 
-Scalar motor commands carry a 32-bit big-endian signed argument with scaling. Commands with dedicated payloads, including SET_POS_SPEED_LOOP, MUX_CAMSEL, and SET_CONFIG, use the layouts below.
+These commands use `VESC_convertCmdToRaw()` and `VESC_convertRawToCmd()`. Scalar motor commands carry a 32-bit big-endian signed argument with scaling; SET_ORIGIN and SET_POS_SPEED_LOOP use command-specific payloads.
 
 > Example:   
 > The command VESC_COMMAND_SET_CURRENT has command id 1 and scaling 1000. The CAN-frame for setting the current to 51 A on VESC ID 23 would look like the following:  
@@ -100,8 +100,6 @@ The following simple commands are available:
 | VESC_COMMAND_SET_CURRENT_BRAKE_REL | 11 | 100000 | % / 100 |  | \-1.0 to 1.0 | BLDC |
 | VESC_COMMAND_SET_CURRENT_HANDBRAKE | 12 | 1000 | A |  | \-MOTOR_MAX to MOTOR_MAX | BLDC |
 | VESC_COMMAND_SET_CURRENT_HANDBRAKE_REL | 13 | 100000 | % / 100 |  | \-1.0 to 1.0 | BLDC |
-| VESC_COMMAND_SET_CONFIG | 103 | N/A | N/A | Two device-specific configuration bytes | DLC 2 | [Profiles](#vesc_command_set_config) |
-| VESC_COMMAND_MUX_CAMSEL | 34 | N/A | Camera number | CameraSelect | N/A | Analog MUX |
 
 > \* VESC_COMMAND_SET_POS for Cubemars is supported but not scaled correctly. Apply 1/100 of value to Cubemars. (Details in #10)
 
@@ -114,6 +112,15 @@ Well, this one isn't that simple..
 | B0 - B3 | Position | Deg | 10000 | Cubemars |
 | B4 - B5 | Speed | ERPM | 0.1 | Cubemars |
 | B6 - B7 | Acceleration | ERPM/s² | 0.1 | Cubemars |
+
+### Command (custom) Frames
+
+These commands use dedicated converter pairs.
+
+| **Command Name** | **Comm ID** | **Payload bytes** | **Converters** | **Availability** |
+|------|------|------|------|------|
+| VESC_COMMAND_MUX_CAMSEL | 34 | 1 | `VESC_convertMuxCamSelToRaw()` / `VESC_convertRawToMuxCamSel()` | Analog MUX |
+| VESC_COMMAND_SET_CONFIG | 103 | 2 | `VESC_convertSetConfigToRaw()` / `VESC_convertRawToSetConfig()` | [Profiles](#vesc_command_set_config) |
 
 #### **VESC_COMMAND_MUX_CAMSEL**
 
