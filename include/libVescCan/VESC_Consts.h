@@ -49,18 +49,16 @@ typedef int8_t VESC_Status_8_ph_t;
 typedef int8_t VESC_Status_8_distance_t;
 
 
-typedef int16_t VESC_Status_9_voltage_t;
+typedef uint8_t VESC_Status_9_voltage_t;
 typedef int16_t VESC_Status_9_current_t;
 typedef int8_t VESC_Status_9_temperature_t;
 typedef uint8_t VESC_Status_9_charge_t;
+typedef uint8_t VESC_Status_9_minutesToTarget_t;
 typedef uint8_t VESC_Status_9_batteryStatus_t;
-typedef uint8_t VESC_Status_9_hotswapStatus_t;
+typedef uint8_t VESC_Status_9_safetyStatus_t;
 
 typedef uint8_t VESC_Status_10_communicationState_t;
 typedef uint16_t VESC_Status_10_controlMode_t;
-
-typedef uint8_t VESC_Mux_Config_1_settings_t;
-typedef uint8_t VESC_Mux_Config_1_vtxConfig_t;
 
 typedef uint8_t VESC_Mux_CamSel_cameraSelect_t;
 
@@ -96,7 +94,9 @@ typedef int16_t VESC_Status_12_z_t;
 #define VESC_CAN_STATUS_8_DLEN 8
 #define VESC_CAN_STATUS_9_DLEN 8
 #define VESC_CAN_STATUS_10_DLEN 3
-#define VESC_CAN_MUX_CONFIG_1_DLEN 2
+#define VESC_CAN_SET_CONFIG_DLEN 2
+#define VESC_CAN_STATUS_13_DLEN 8
+#define VESC_CAN_HEARTBEAT_STATUS_DLEN 2
 #define VESC_CAN_MUX_CAMSEL_DLEN 1
 #define VESC_CAN_MUX_STATUS_DLEN 7
 #define VESC_CAN_STATUS_11_DLEN 8
@@ -106,41 +106,26 @@ typedef int16_t VESC_Status_12_z_t;
 // bitlen
 //****
 
-#define VESC_CAN_MUX_CONFIG_1_SETTINGS_STATE_BITLEN 1
-#define VESC_CAN_MUX_CONFIG_1_SETTINGS_MODE_BITLEN 2
-#define VESC_CAN_MUX_CONFIG_1_SETTINGS_RESERVED_BITLEN 5
-#define VESC_CAN_MUX_CONFIG_1_VTXCONFIG_POWER_BITLEN 2
-#define VESC_CAN_MUX_CONFIG_1_VTXCONFIG_BAND_BITLEN 2
-#define VESC_CAN_MUX_CONFIG_1_VTXCONFIG_CHANNEL_BITLEN 3
-#define VESC_CAN_MUX_CONFIG_1_VTXCONFIG_RESERVED_BITLEN 1
-
-#define VESC_CAN_MUX_STATUS_SETTINGS_STATE_BITLEN     VESC_CAN_MUX_CONFIG_1_SETTINGS_STATE_BITLEN
-#define VESC_CAN_MUX_STATUS_SETTINGS_MODE_BITLEN      VESC_CAN_MUX_CONFIG_1_SETTINGS_MODE_BITLEN
-#define VESC_CAN_MUX_STATUS_SETTINGS_RESERVED_BITLEN  VESC_CAN_MUX_CONFIG_1_SETTINGS_RESERVED_BITLEN
-#define VESC_CAN_MUX_STATUS_VTXCONFIG_POWER_BITLEN    VESC_CAN_MUX_CONFIG_1_VTXCONFIG_POWER_BITLEN
-#define VESC_CAN_MUX_STATUS_VTXCONFIG_BAND_BITLEN     VESC_CAN_MUX_CONFIG_1_VTXCONFIG_BAND_BITLEN
-#define VESC_CAN_MUX_STATUS_VTXCONFIG_CHANNEL_BITLEN  VESC_CAN_MUX_CONFIG_1_VTXCONFIG_CHANNEL_BITLEN
-#define VESC_CAN_MUX_STATUS_VTXCONFIG_RESERVED_BITLEN VESC_CAN_MUX_CONFIG_1_VTXCONFIG_RESERVED_BITLEN
+#define VESC_CAN_MUX_STATUS_SETTINGS_STATE_BITLEN     1
+#define VESC_CAN_MUX_STATUS_SETTINGS_MODE_BITLEN      2
+#define VESC_CAN_MUX_STATUS_SETTINGS_RESERVED_BITLEN  5
+#define VESC_CAN_MUX_STATUS_VTXCONFIG_POWER_BITLEN    2
+#define VESC_CAN_MUX_STATUS_VTXCONFIG_BAND_BITLEN     2
+#define VESC_CAN_MUX_STATUS_VTXCONFIG_CHANNEL_BITLEN  3
+#define VESC_CAN_MUX_STATUS_VTXCONFIG_RESERVED_BITLEN 1
 
 //****
 // bit mask
 //****
 
-static const uint8_t VESC_CAN_MUX_CONFIG_1_SETTINGS_STATE_MASK     = VESC_CreateMask(VESC_CAN_MUX_CONFIG_1_SETTINGS_STATE_BITLEN);
-static const uint8_t VESC_CAN_MUX_CONFIG_1_SETTINGS_MODE_MASK      = VESC_CreateMask(VESC_CAN_MUX_CONFIG_1_SETTINGS_MODE_BITLEN);
-static const uint8_t VESC_CAN_MUX_CONFIG_1_SETTINGS_RESERVED_MASK  = VESC_CreateMask(VESC_CAN_MUX_CONFIG_1_SETTINGS_RESERVED_BITLEN);
-static const uint8_t VESC_CAN_MUX_CONFIG_1_VTXCONFIG_POWER_MASK    = VESC_CreateMask(VESC_CAN_MUX_CONFIG_1_VTXCONFIG_POWER_BITLEN);
-static const uint8_t VESC_CAN_MUX_CONFIG_1_VTXCONFIG_BAND_MASK     = VESC_CreateMask(VESC_CAN_MUX_CONFIG_1_VTXCONFIG_BAND_BITLEN);
-static const uint8_t VESC_CAN_MUX_CONFIG_1_VTXCONFIG_CHANNEL_MASK  = VESC_CreateMask(VESC_CAN_MUX_CONFIG_1_VTXCONFIG_CHANNEL_BITLEN);
-static const uint8_t VESC_CAN_MUX_CONFIG_1_VTXCONFIG_RESERVED_MASK = VESC_CreateMask(VESC_CAN_MUX_CONFIG_1_VTXCONFIG_RESERVED_BITLEN);
-
-static const uint8_t VESC_CAN_MUX_STATUS_SETTINGS_STATE_MASK     = VESC_CAN_MUX_CONFIG_1_SETTINGS_STATE_MASK;
-static const uint8_t VESC_CAN_MUX_STATUS_SETTINGS_MODE_MASK      = VESC_CAN_MUX_CONFIG_1_SETTINGS_MODE_MASK;
-static const uint8_t VESC_CAN_MUX_STATUS_SETTINGS_RESERVED_MASK  = VESC_CAN_MUX_CONFIG_1_SETTINGS_RESERVED_MASK;
-static const uint8_t VESC_CAN_MUX_STATUS_VTXCONFIG_POWER_MASK    = VESC_CAN_MUX_CONFIG_1_VTXCONFIG_POWER_MASK;
-static const uint8_t VESC_CAN_MUX_STATUS_VTXCONFIG_BAND_MASK     = VESC_CAN_MUX_CONFIG_1_VTXCONFIG_BAND_MASK;
-static const uint8_t VESC_CAN_MUX_STATUS_VTXCONFIG_CHANNEL_MASK  = VESC_CAN_MUX_CONFIG_1_VTXCONFIG_CHANNEL_MASK;
-static const uint8_t VESC_CAN_MUX_STATUS_VTXCONFIG_RESERVED_MASK = VESC_CAN_MUX_CONFIG_1_VTXCONFIG_RESERVED_MASK;
+/* Unshifted masks for the logical MUX_STATUS fields. */
+#define VESC_CAN_MUX_STATUS_SETTINGS_STATE_MASK     0x01U
+#define VESC_CAN_MUX_STATUS_SETTINGS_MODE_MASK      0x03U
+#define VESC_CAN_MUX_STATUS_SETTINGS_RESERVED_MASK  0x1FU
+#define VESC_CAN_MUX_STATUS_VTXCONFIG_POWER_MASK    0x03U
+#define VESC_CAN_MUX_STATUS_VTXCONFIG_BAND_MASK     0x03U
+#define VESC_CAN_MUX_STATUS_VTXCONFIG_CHANNEL_MASK  0x07U
+#define VESC_CAN_MUX_STATUS_VTXCONFIG_RESERVED_MASK 0x01U
 
 //****
 // enums
@@ -161,6 +146,7 @@ typedef enum VESC_Command_enum
     VESC_COMMAND_SET_CURRENT_BRAKE_REL = 11,     // arg unit [% / 100]
     VESC_COMMAND_SET_CURRENT_HANDBRAKE = 12,     // arg unit [A]
     VESC_COMMAND_SET_CURRENT_HANDBRAKE_REL = 13, // arg unit [% / 100]
+    VESC_COMMAND_SET_CONFIG = 103,              // two device-specific bytes
 
     // Direction ROS <-- CAN
 
@@ -175,13 +161,14 @@ typedef enum VESC_Command_enum
     VESC_COMMAND_STATUS_8 = 30,
     VESC_COMMAND_STATUS_9 = 31,
 	VESC_COMMAND_STATUS_10 = 32,
-	VESC_COMMAND_MUX_CONFIG_1 = 33,
 	VESC_COMMAND_MUX_CAMSEL = 34,
 	VESC_COMMAND_MUX_STATUS = 35,
 	// cubemars
 	VESC_COMMAND_STATUS_11 = 41,
 	// non standard IMU frame
 	VESC_COMMAND_STATUS_12 = 42,
+    VESC_COMMAND_STATUS_13 = 43,
+    VESC_COMMAND_HEARTBEAT_STATUS = 235,
 } VESC_Command;
 
 typedef enum VESC_SetOrigin_Command_Enum
@@ -242,18 +229,16 @@ typedef enum VESC_SetOrigin_Command_Enum
 #define VESC_SCALE_STATUS_8_DISTANCE 1
 
 
-#define VESC_SCALE_STATUS_9_VOLTAGE 1000
+#define VESC_SCALE_STATUS_9_VOLTAGE 10
 #define VESC_SCALE_STATUS_9_CURRENT 1000
 #define VESC_SCALE_STATUS_9_TEMPERATURE 1
 #define VESC_SCALE_STATUS_9_CHARGE 1
+#define VESC_SCALE_STATUS_9_MINUTES_TO_TARGET 1
 #define VESC_SCALE_STATUS_9_BATTERY_STATUS VESC_SCALE_NA
-#define VESC_SCALE_STATUS_9_HOTSWAP_STATUS VESC_SCALE_NA
+#define VESC_SCALE_STATUS_9_SAFETY_STATUS VESC_SCALE_NA
 
 #define VESC_SCALE_STATUS_10_COMMUNICATIONSTATE VESC_SCALE_NA
 #define VESC_SCALE_STATUS_10_CONTROLMODE VESC_SCALE_NA
-
-#define VESC_SCALE_MUX_CONFIG_1_SETTINGS VESC_SCALE_NA
-#define VESC_SCALE_MUX_CONFIG_1_VTXCONFIG VESC_SCALE_NA
 
 #define VESC_SCALE_MUX_CAMSEL_CAMERA_SELECT 1
 
@@ -343,23 +328,18 @@ enum _VESC_offsetIdx_Status_8_enum
 enum _VESC_offsetIdx_Status_9_enum
 {
 	_VESC_OFFSETIDX_STATUS_9_VOLTAGE = 0,
+	_VESC_OFFSETIDX_STATUS_9_CHARGE,
 	_VESC_OFFSETIDX_STATUS_9_CURRENT,
 	_VESC_OFFSETIDX_STATUS_9_TEMPERATURE,
-	_VESC_OFFSETIDX_STATUS_9_CHARGE,
+	_VESC_OFFSETIDX_STATUS_9_MINUTES_TO_TARGET,
 	_VESC_OFFSETIDX_STATUS_9_BATTERY_STATUS,
-	_VESC_OFFSETIDX_STATUS_9_HOTSWAP_STATUS
+	_VESC_OFFSETIDX_STATUS_9_SAFETY_STATUS
 };
 
 enum _VESC_offsetIdx_Status_10_enum
 {
 	_VESC_OFFSETIDX_STATUS_10_COMMUNICATIONSTATE = 0,
 	_VESC_OFFSETIDX_STATUS_10_CONTROLMODE,
-};
-
-enum _VESC_offsetIdx_Mux_Config_1_enum
-{
-	_VESC_OFFSETIDX_MUX_CONFIG_1_SETTINGS = 0,
-	_VESC_OFFSETIDX_MUX_CONFIG_1_VTX_CONFIG,
 };
 
 enum _VESC_offsetIdx_Mux_CamSel_enum
@@ -465,22 +445,17 @@ static const int _VESC_offset_Status_9[] =
 {
     0,
 	sizeof(VESC_Status_9_voltage_t),
-	sizeof(VESC_Status_9_voltage_t) + sizeof(VESC_Status_9_current_t),
-	sizeof(VESC_Status_9_voltage_t) + sizeof(VESC_Status_9_current_t) + sizeof(VESC_Status_9_temperature_t),
-	sizeof(VESC_Status_9_voltage_t) + sizeof(VESC_Status_9_current_t) + sizeof(VESC_Status_9_temperature_t) + sizeof(VESC_Status_9_charge_t),
-	sizeof(VESC_Status_9_voltage_t) + sizeof(VESC_Status_9_current_t) + sizeof(VESC_Status_9_temperature_t) + sizeof(VESC_Status_9_charge_t) + sizeof(VESC_Status_9_batteryStatus_t)
+	sizeof(VESC_Status_9_voltage_t) + sizeof(VESC_Status_9_charge_t),
+	sizeof(VESC_Status_9_voltage_t) + sizeof(VESC_Status_9_charge_t) + sizeof(VESC_Status_9_current_t),
+	sizeof(VESC_Status_9_voltage_t) + sizeof(VESC_Status_9_charge_t) + sizeof(VESC_Status_9_current_t) + sizeof(VESC_Status_9_temperature_t),
+	sizeof(VESC_Status_9_voltage_t) + sizeof(VESC_Status_9_charge_t) + sizeof(VESC_Status_9_current_t) + sizeof(VESC_Status_9_temperature_t) + sizeof(VESC_Status_9_minutesToTarget_t),
+	sizeof(VESC_Status_9_voltage_t) + sizeof(VESC_Status_9_charge_t) + sizeof(VESC_Status_9_current_t) + sizeof(VESC_Status_9_temperature_t) + sizeof(VESC_Status_9_minutesToTarget_t) + sizeof(VESC_Status_9_batteryStatus_t)
 };
 
 static const int _VESC_offset_Status_10[] =
 {
     0,
     sizeof(VESC_Status_10_communicationState_t),
-};
-
-static const int _VESC_offset_Mux_Config_1[] = 
-{
-    0,
-    sizeof(VESC_Mux_Config_1_settings_t),
 };
 
 static const int _VESC_offset_Mux_CamSel[] = 

@@ -4,5 +4,7 @@
 #include <libVescCan/VESC_Convert.h>
 #include <libVescCan/VESC_Status_9_Consts.h>
 #include <libVescCan/VESC_Status_10_Consts.h>
-#include <libVescCan/VESC_Mux_Config_1_Consts.h>
+#include <libVescCan/VESC_Mux_Consts.h>
+#include <libVescCan/VESC_HotSwap_Consts.h>
+#include <libVescCan/VESC_Heartbeat_Consts.h>
 #include <libVescCan/VESC_Status_11_Consts.h>

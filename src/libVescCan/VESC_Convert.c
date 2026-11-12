@@ -1,7 +1,8 @@
 #include "libVescCan/VESC_Consts.h"
-#include "libVescCan/VESC_Mux_Config_1_Consts.h"
+#include "libVescCan/VESC_Mux_Consts.h"
 #include "libVescCan/VESC_Structs.h"
 #include <libVescCan/VESC_Convert.h>
+#include <math.h>
 
 bool VESC_convertCmdToRaw(VESC_RawFrame* out, const VESC_CommandFrame* in)
 {
@@ -172,18 +173,81 @@ bool VESC_convertStatus8ToRaw(VESC_RawFrame* out, const VESC_Status_8* in)
 
 bool VESC_convertStatus9ToRaw(VESC_RawFrame* out, const VESC_Status_9* in)
 {
-	out->vescID = in->vescID;
-	out->command = VESC_COMMAND_STATUS_9;
-	out->_reserved = VESC_CAN_EXTID_FLAG;
-	out->can_dlc = VESC_CAN_STATUS_9_DLEN;
+	if (out == NULL || in == NULL)
+		return false;
 
-	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_VOLTAGE], in->voltage, VESC_SCALE_STATUS_9_VOLTAGE);
-	_VESC_WriteRawData16(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_CURRENT], in->current, VESC_SCALE_STATUS_9_CURRENT);
-	_VESC_WriteRawData8(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_TEMPERATURE], in->temperature, VESC_SCALE_STATUS_9_TEMPERATURE);
-	_VESC_WriteRawData8u(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_CHARGE], in->charge, VESC_SCALE_STATUS_9_CHARGE);
-	_VESC_WriteRawData8u(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_BATTERY_STATUS], in->batteryStatus, VESC_SCALE_STATUS_9_BATTERY_STATUS);
-	_VESC_WriteRawData8u(out, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_HOTSWAP_STATUS], in->hotswapStatus, VESC_SCALE_STATUS_9_HOTSWAP_STATUS);
+	if (!isfinite(in->voltage) || in->voltage < 0.0f || in->voltage > 25.5f ||
+		!isfinite(in->current) || in->current < -32.768f || in->current > 32.767f ||
+		!isfinite(in->temperature) || in->temperature < -128.0f || in->temperature > 127.0f ||
+		!isfinite(in->charge) || in->charge < 0.0f || in->charge > 100.0f)
+		return false;
 
+	VESC_RawFrame frame = {0};
+	frame.vescID = in->vescID;
+	frame.command = VESC_COMMAND_STATUS_9;
+	frame._reserved = VESC_CAN_EXTID_FLAG;
+	frame.can_dlc = VESC_CAN_STATUS_9_DLEN;
+
+	/* Store explicit bytes to avoid unaligned accesses and signed endian-helper
+	 * conversions. Widen before rounding and narrowing signed measurements. */
+	const float scaledCurrent = in->current * VESC_SCALE_STATUS_9_CURRENT;
+	const int32_t current = (int32_t)(scaledCurrent + (scaledCurrent >= 0.0f ? 0.5f : -0.5f));
+	const uint16_t currentBits = (uint16_t)current;
+	const int32_t temperature = (int32_t)in->temperature;
+	frame.rawData[0] = (uint8_t)(in->voltage * VESC_SCALE_STATUS_9_VOLTAGE + 0.5f);
+	frame.rawData[1] = (uint8_t)in->charge;
+	frame.rawData[2] = (uint8_t)(currentBits >> 8);
+	frame.rawData[3] = (uint8_t)(currentBits & 0xFFU);
+	frame.rawData[4] = (uint8_t)temperature;
+	frame.rawData[5] = in->minutesToTarget;
+	frame.rawData[6] = in->batteryStatus;
+	frame.rawData[7] = in->safetyStatus;
+	*out = frame;
+	return true;
+}
+
+bool VESC_convertSetConfigToRaw(VESC_RawFrame* out, const VESC_SetConfig* in)
+{
+	if (out == NULL || in == NULL)
+		return false;
+
+	VESC_RawFrame frame = {0};
+	frame.vescID = in->vescID;
+	frame.command = VESC_COMMAND_SET_CONFIG;
+	frame._reserved = VESC_CAN_EXTID_FLAG;
+	frame.can_dlc = VESC_CAN_SET_CONFIG_DLEN;
+	memcpy(frame.rawData, in->data, sizeof(in->data));
+	*out = frame;
+	return true;
+}
+
+bool VESC_convertStatus13ToRaw(VESC_RawFrame* out, const VESC_Status_13* in)
+{
+	if (out == NULL || in == NULL)
+		return false;
+
+	VESC_RawFrame frame = {0};
+	frame.vescID = in->vescID;
+	frame.command = VESC_COMMAND_STATUS_13;
+	frame._reserved = VESC_CAN_EXTID_FLAG;
+	frame.can_dlc = VESC_CAN_STATUS_13_DLEN;
+	memcpy(frame.rawData, in->data, sizeof(in->data));
+	*out = frame;
+	return true;
+}
+
+bool VESC_convertHeartbeatStatusToRaw(VESC_RawFrame* out, const VESC_Heartbeat_Status* in)
+{
+	if (out == NULL || in == NULL)
+		return false;
+
+	VESC_RawFrame frame = {0};
+	frame.vescID = in->vescID;
+	frame.command = VESC_COMMAND_HEARTBEAT_STATUS;
+	frame._reserved = VESC_CAN_EXTID_FLAG;
+	frame.can_dlc = VESC_CAN_HEARTBEAT_STATUS_DLEN;
+	memcpy(frame.rawData, in->data, sizeof(in->data));
+	*out = frame;
 	return true;
 }
 
@@ -196,34 +260,6 @@ bool VESC_convertStatus10ToRaw(VESC_RawFrame* out, const VESC_Status_10* in)
 
 	_VESC_WriteRawData8u(out, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_COMMUNICATIONSTATE], in->communicationState, VESC_SCALE_STATUS_10_COMMUNICATIONSTATE);
 	_VESC_WriteRawData16u(out, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_CONTROLMODE], in->controlMode, VESC_SCALE_STATUS_10_CONTROLMODE);
-
-	return true;
-}
-
-bool VESC_convertMuxConfig1ToRaw(VESC_RawFrame* out, const VESC_Mux_Config_1* in)
-{
-	out->vescID = in->vescID;
-	out->command = VESC_COMMAND_MUX_CONFIG_1;
-	out->_reserved = VESC_CAN_EXTID_FLAG;
-	out->can_dlc = VESC_CAN_MUX_CONFIG_1_DLEN;
-
-	VESC_CAN_Mux_Config_1_settings settings_raw = 
-	{
-		in->settings.state & VESC_CAN_MUX_CONFIG_1_SETTINGS_STATE_MASK,
-		in->settings.mode & VESC_CAN_MUX_CONFIG_1_SETTINGS_MODE_MASK,
-		in->settings._reserved & VESC_CAN_MUX_CONFIG_1_SETTINGS_RESERVED_MASK,
-	};
-
-	VESC_CAN_Mux_Config_1_vtxConfig vtxConfig_raw = 
-	{
-		in->vtxConfig.power & VESC_CAN_MUX_CONFIG_1_VTXCONFIG_POWER_MASK,
-		in->vtxConfig.band & VESC_CAN_MUX_CONFIG_1_VTXCONFIG_BAND_MASK,
-		in->vtxConfig.channel & VESC_CAN_MUX_CONFIG_1_VTXCONFIG_CHANNEL_MASK,
-		in->vtxConfig._reserved & VESC_CAN_MUX_CONFIG_1_VTXCONFIG_RESERVED_MASK,
-	};
-
-	_VESC_WriteRawData8u(out, _VESC_offset_Mux_Config_1[_VESC_OFFSETIDX_MUX_CONFIG_1_SETTINGS], *((uint8_t*)&settings_raw), VESC_SCALE_MUX_CONFIG_1_SETTINGS);
-	_VESC_WriteRawData8u(out, _VESC_offset_Mux_Config_1[_VESC_OFFSETIDX_MUX_CONFIG_1_VTX_CONFIG], *((uint8_t*)&vtxConfig_raw), VESC_SCALE_MUX_CONFIG_1_VTXCONFIG);
 
 	return true;
 }
@@ -247,23 +283,13 @@ bool VESC_convertMuxStatusToRaw(VESC_RawFrame* out, const VESC_Mux_Status* in)
 	out->_reserved = VESC_CAN_EXTID_FLAG;
 	out->can_dlc = VESC_CAN_MUX_STATUS_DLEN;
 
-	VESC_CAN_Mux_Config_1_settings settings_raw = 
-	{
-		in->settings.state & VESC_CAN_MUX_STATUS_SETTINGS_STATE_MASK,
-		in->settings.mode & VESC_CAN_MUX_STATUS_SETTINGS_MODE_MASK,
-		in->settings._reserved & VESC_CAN_MUX_STATUS_SETTINGS_RESERVED_MASK,
-	};
-
-	VESC_CAN_Mux_Config_1_vtxConfig vtxConfig_raw = 
-	{
-		in->vtxConfig.power & VESC_CAN_MUX_STATUS_VTXCONFIG_POWER_MASK,
-		in->vtxConfig.band & VESC_CAN_MUX_STATUS_VTXCONFIG_BAND_MASK,
-		in->vtxConfig.channel & VESC_CAN_MUX_STATUS_VTXCONFIG_CHANNEL_MASK,
-		in->vtxConfig._reserved & VESC_CAN_MUX_STATUS_VTXCONFIG_RESERVED_MASK,
-	};
-
-	_VESC_WriteRawData8u(out, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_SETTINGS], *((uint8_t*)&settings_raw), VESC_SCALE_MUX_STATUS_SETTINGS);
-	_VESC_WriteRawData8u(out, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_VTX_CONFIG], *((uint8_t*)&vtxConfig_raw), VESC_SCALE_MUX_STATUS_VTXCONFIG);
+	out->rawData[0] = (uint8_t)(((uint32_t)in->settings.state & 0x01U) |
+		(((uint32_t)in->settings.mode & 0x03U) << 1) |
+		(((uint32_t)in->settings._reserved & 0x1FU) << 3));
+	out->rawData[1] = (uint8_t)(((uint32_t)in->vtxConfig.power & 0x03U) |
+		(((uint32_t)in->vtxConfig.band & 0x03U) << 2) |
+		(((uint32_t)in->vtxConfig.channel & 0x07U) << 4) |
+		(((uint32_t)in->vtxConfig._reserved & 0x01U) << 7));
 	_VESC_WriteRawData8u(out, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_CAMERA_SELECT], in->cameraSelect, VESC_SCALE_MUX_STATUS_CAMERA_SELECT);
 	_VESC_WriteRawData16(out, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_VTX_TEMP], in->vtxTemp, VESC_SCALE_MUX_STATUS_VTX_TEMP);
 	_VESC_WriteRawData16(out, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_BOARD_TEMP], in->boardTemp, VESC_SCALE_MUX_STATUS_BOARD_TEMP);
@@ -466,18 +492,64 @@ bool VESC_convertRawToStatus8(VESC_Status_8* out, const VESC_RawFrame* in)
 
 bool VESC_convertRawToStatus9(VESC_Status_9* out, const VESC_RawFrame* in)
 {
-	if (in->command != VESC_COMMAND_STATUS_9)
+	if (out == NULL || in == NULL || in->command != VESC_COMMAND_STATUS_9 ||
+		in->can_dlc != VESC_CAN_STATUS_9_DLEN || in->rawData[1] > 100U)
 		return false;
 
-	out->vescID = in->vescID;
+	VESC_Status_9 status = {0};
+	status.vescID = in->vescID;
+	status.voltage = in->rawData[0] / (float)VESC_SCALE_STATUS_9_VOLTAGE;
+	status.charge = (float)in->rawData[1];
+	const uint16_t currentBits = ((uint16_t)in->rawData[2] << 8) | in->rawData[3];
+	const int32_t current = (currentBits & 0x8000U) != 0U ?
+		(int32_t)currentBits - 65536 : (int32_t)currentBits;
+	const int32_t temperature = (in->rawData[4] & 0x80U) != 0U ?
+		(int32_t)in->rawData[4] - 256 : (int32_t)in->rawData[4];
+	status.current = current / (float)VESC_SCALE_STATUS_9_CURRENT;
+	status.temperature = (float)temperature;
+	status.minutesToTarget = in->rawData[5];
+	status.batteryStatus = in->rawData[6];
+	status.safetyStatus = in->rawData[7];
+	*out = status;
+	return true;
+}
 
-	_VESC_ReadRawData16(out->voltage, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_VOLTAGE], VESC_SCALE_STATUS_9_VOLTAGE,/*none*/);
-	_VESC_ReadRawData16(out->current, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_CURRENT], VESC_SCALE_STATUS_9_CURRENT,/*none*/);
-	_VESC_ReadRawData8(out->temperature, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_TEMPERATURE], VESC_SCALE_STATUS_9_TEMPERATURE,/*none*/);
-	_VESC_ReadRawData8u(out->charge, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_CHARGE], VESC_SCALE_STATUS_9_CHARGE,/*none*/);
-	_VESC_ReadRawData8u(out->batteryStatus, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_BATTERY_STATUS], VESC_SCALE_STATUS_9_BATTERY_STATUS,/*none*/);
-	_VESC_ReadRawData8u(out->hotswapStatus, in, _VESC_offset_Status_9[_VESC_OFFSETIDX_STATUS_9_HOTSWAP_STATUS], VESC_SCALE_STATUS_9_HOTSWAP_STATUS,/*none*/);
+bool VESC_convertRawToSetConfig(VESC_SetConfig* out, const VESC_RawFrame* in)
+{
+	if (out == NULL || in == NULL || in->command != VESC_COMMAND_SET_CONFIG ||
+		in->can_dlc != VESC_CAN_SET_CONFIG_DLEN)
+		return false;
 
+	VESC_SetConfig config = {0};
+	config.vescID = in->vescID;
+	memcpy(config.data, in->rawData, sizeof(config.data));
+	*out = config;
+	return true;
+}
+
+bool VESC_convertRawToStatus13(VESC_Status_13* out, const VESC_RawFrame* in)
+{
+	if (out == NULL || in == NULL || in->command != VESC_COMMAND_STATUS_13 ||
+		in->can_dlc != VESC_CAN_STATUS_13_DLEN)
+		return false;
+
+	VESC_Status_13 status = {0};
+	status.vescID = in->vescID;
+	memcpy(status.data, in->rawData, sizeof(status.data));
+	*out = status;
+	return true;
+}
+
+bool VESC_convertRawToHeartbeatStatus(VESC_Heartbeat_Status* out, const VESC_RawFrame* in)
+{
+	if (out == NULL || in == NULL || in->command != VESC_COMMAND_HEARTBEAT_STATUS ||
+		in->can_dlc != VESC_CAN_HEARTBEAT_STATUS_DLEN)
+		return false;
+
+	VESC_Heartbeat_Status heartbeat = {0};
+	heartbeat.vescID = in->vescID;
+	memcpy(heartbeat.data, in->rawData, sizeof(heartbeat.data));
+	*out = heartbeat;
 	return true;
 }
 
@@ -490,31 +562,6 @@ bool VESC_convertRawToStatus10(VESC_Status_10* out, const VESC_RawFrame* in)
 
 	_VESC_ReadRawData8u(out->communicationState, in, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_COMMUNICATIONSTATE], VESC_SCALE_STATUS_10_COMMUNICATIONSTATE,(VESC_Status_10_CommunicationState));
 	_VESC_ReadRawData16u(out->controlMode, in, _VESC_offset_Status_10[_VESC_OFFSETIDX_STATUS_10_CONTROLMODE], VESC_SCALE_STATUS_10_CONTROLMODE,(VESC_Status_10_controlMode_t));
-
-	return true;
-}
-
-bool VESC_convertRawToMuxConfig1(VESC_Mux_Config_1* out, const VESC_RawFrame* in)
-{
-	if (in->command != VESC_COMMAND_MUX_CONFIG_1)
-		return false;
-
-	out->vescID = in->vescID;
-
-	VESC_CAN_Mux_Config_1_settings settings_raw ;
-
-	VESC_CAN_Mux_Config_1_vtxConfig vtxConfig_raw ;
-
-	_VESC_ReadRawData8u(*((uint8_t*)&settings_raw), in, _VESC_offset_Mux_Config_1[_VESC_OFFSETIDX_MUX_CONFIG_1_SETTINGS], VESC_SCALE_MUX_CONFIG_1_SETTINGS,(uint8_t));
-	out->settings.state = settings_raw.state;
-	out->settings.mode = settings_raw.mode;
-	out->settings._reserved = settings_raw.reserved;
-
-	_VESC_ReadRawData8u(*((uint8_t*)&vtxConfig_raw), in, _VESC_offset_Mux_Config_1[_VESC_OFFSETIDX_MUX_CONFIG_1_VTX_CONFIG], VESC_SCALE_MUX_CONFIG_1_VTXCONFIG,(uint8_t));
-	out->vtxConfig.power = vtxConfig_raw.power;
-	out->vtxConfig.band = vtxConfig_raw.band;
-	out->vtxConfig.channel = vtxConfig_raw.channel;
-	out->vtxConfig._reserved = vtxConfig_raw.reserved;
 
 	return true;
 }
@@ -538,20 +585,15 @@ bool VESC_convertRawToMuxStatus(VESC_Mux_Status* out, const VESC_RawFrame* in)
 
 	out->vescID = in->vescID;
 
-	VESC_CAN_Mux_Status_settings settings_raw ;
-
-	VESC_CAN_Mux_Status_vtxConfig vtxConfig_raw ;
-
-	_VESC_ReadRawData8u(*((uint8_t*)&settings_raw), in, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_SETTINGS], VESC_SCALE_MUX_STATUS_SETTINGS,(uint8_t));
-	out->settings.state = settings_raw.state;
-	out->settings.mode = settings_raw.mode;
-	out->settings._reserved = settings_raw.reserved;
-
-	_VESC_ReadRawData8u(*((uint8_t*)&vtxConfig_raw), in, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_VTX_CONFIG], VESC_SCALE_MUX_STATUS_VTXCONFIG,(uint8_t));
-	out->vtxConfig.power = vtxConfig_raw.power;
-	out->vtxConfig.band = vtxConfig_raw.band;
-	out->vtxConfig.channel = vtxConfig_raw.channel;
-	out->vtxConfig._reserved = vtxConfig_raw.reserved;
+	const uint8_t settings = in->rawData[0];
+	const uint8_t vtxConfig = in->rawData[1];
+	out->settings.state = (settings & 0x01U) != 0U;
+	out->settings.mode = (VESC_Mux_Mode)((settings >> 1) & 0x03U);
+	out->settings._reserved = (settings >> 3) & 0x1FU;
+	out->vtxConfig.power = (VESC_Mux_Power)(vtxConfig & 0x03U);
+	out->vtxConfig.band = (VESC_Mux_Band)((vtxConfig >> 2) & 0x03U);
+	out->vtxConfig.channel = (vtxConfig >> 4) & 0x07U;
+	out->vtxConfig._reserved = (vtxConfig >> 7) & 0x01U;
 
 	_VESC_ReadRawData8u(out->cameraSelect, in, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_CAMERA_SELECT], VESC_SCALE_MUX_STATUS_CAMERA_SELECT, /*none*/);
 	_VESC_ReadRawData16(out->vtxTemp, in, _VESC_offset_Mux_Status[_VESC_OFFSETIDX_MUX_STATUS_VTX_TEMP], VESC_SCALE_MUX_STATUS_VTX_TEMP, /*none*/);

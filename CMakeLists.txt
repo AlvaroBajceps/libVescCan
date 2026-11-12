@@ -29,6 +29,18 @@ target_include_directories(libVescCan PUBLIC
 	$<INSTALL_INTERFACE:include>
 )
 
+# Host codec checks are opt-in and do not change embedded consumers.
+option(LIBVESCCAN_BUILD_TESTS "Build host codec tests" OFF)
+if(LIBVESCCAN_BUILD_TESTS)
+	enable_testing()
+	add_executable(libVescCan_codec_tests tests/test_codecs.c)
+	target_link_libraries(libVescCan_codec_tests PRIVATE libVescCan)
+	if(UNIX)
+		target_link_libraries(libVescCan_codec_tests PRIVATE m)
+	endif()
+	add_test(NAME libVescCan_codecs COMMAND libVescCan_codec_tests)
+endif()
+
 # install lib
 install(TARGETS libVescCan
 	EXPORT libVescCan

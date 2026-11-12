@@ -1,0 +1,70 @@
+#ifndef VESC_HotSwap_Consts_h_
+#define VESC_HotSwap_Consts_h_
+
+/* HotSwap SET_CONFIG bytes. Generic codecs do not interpret these fields. */
+#define VESC_HOTSWAP_CONFIG_FLAGS_BYTE 0U
+#define VESC_HOTSWAP_CONFIG_EFUSE_BYTE 1U
+#define VESC_HOTSWAP_CONFIG_MASK_LEFT_HS      (1U << 0)
+#define VESC_HOTSWAP_CONFIG_MASK_CENTER_HS    (1U << 1)
+#define VESC_HOTSWAP_CONFIG_MASK_RIGHT_HS     (1U << 2)
+#define VESC_HOTSWAP_CONFIG_MASK_AUTO         (1U << 3)
+#define VESC_HOTSWAP_CONFIG_MASK_S2           (1U << 4)
+#define VESC_HOTSWAP_CONFIG_MASK_RESET_LEFT   (1U << 5)
+#define VESC_HOTSWAP_CONFIG_MASK_RESET_CENTER (1U << 6)
+#define VESC_HOTSWAP_CONFIG_MASK_RESET_RIGHT  (1U << 7)
+
+/* Shared HS status: STATUS_13 B0 and HEARTBEAT_STATUS B1. */
+#define VESC_HOTSWAP_STATUS_MASK_LEFT_HS           (1U << 0)
+#define VESC_HOTSWAP_STATUS_MASK_CENTER_HS         (1U << 1)
+#define VESC_HOTSWAP_STATUS_MASK_RIGHT_HS          (1U << 2)
+#define VESC_HOTSWAP_STATUS_MASK_AUTO              (1U << 3)
+#define VESC_HOTSWAP_STATUS_MASK_S1                (1U << 4)
+#define VESC_HOTSWAP_STATUS_MASK_S2                (1U << 5)
+#define VESC_HOTSWAP_STATUS_MASK_RESISTORS_PRESENT (1U << 6)
+#define VESC_HOTSWAP_STATUS_MASK_EFUSE_PRESENT     (1U << 7)
+
+#define VESC_HOTSWAP_STATUS_13_HS_BYTE            0U
+#define VESC_HOTSWAP_STATUS_13_EFUSE_BYTE         1U
+#define VESC_HOTSWAP_STATUS_13_RESISTOR_TEMP_BYTE 2U
+#define VESC_HOTSWAP_STATUS_13_LEFT_NUMBER_BYTE   3U
+#define VESC_HOTSWAP_STATUS_13_CENTER_NUMBER_BYTE 4U
+#define VESC_HOTSWAP_STATUS_13_RIGHT_NUMBER_BYTE  5U
+#define VESC_HOTSWAP_BATTERY_NUMBER_MIN          1U
+#define VESC_HOTSWAP_BATTERY_NUMBER_MAX          15U
+#define VESC_HOTSWAP_BATTERY_NUMBER_UNAVAILABLE  255U
+
+/* STATUS_13 B6: controller in low nibble, left battery in high nibble.
+ * STATUS_13 B7: center battery in low nibble, right battery in high nibble. */
+#define VESC_HOTSWAP_STATE_VALUE_MASK             0x0FU
+#define VESC_HOTSWAP_CONTROLLER_STATE_BYTE        6U
+#define VESC_HOTSWAP_CONTROLLER_STATE_MASK        0x0FU
+#define VESC_HOTSWAP_CONTROLLER_STATE_SHIFT       0U
+#define VESC_HOTSWAP_LEFT_STATE_BYTE              6U
+#define VESC_HOTSWAP_LEFT_STATE_MASK              0xF0U
+#define VESC_HOTSWAP_LEFT_STATE_SHIFT             4U
+#define VESC_HOTSWAP_CENTER_STATE_BYTE            7U
+#define VESC_HOTSWAP_CENTER_STATE_MASK            0x0FU
+#define VESC_HOTSWAP_CENTER_STATE_SHIFT           0U
+#define VESC_HOTSWAP_RIGHT_STATE_BYTE             7U
+#define VESC_HOTSWAP_RIGHT_STATE_MASK             0xF0U
+#define VESC_HOTSWAP_RIGHT_STATE_SHIFT            4U
+
+/* Controller state codes 6..15 are reserved. */
+#define VESC_HOTSWAP_STATE_INITIALIZING      0U
+#define VESC_HOTSWAP_STATE_FIXED_ALL_ON      1U
+#define VESC_HOTSWAP_STATE_MANUAL            2U
+#define VESC_HOTSWAP_STATE_AUTO_PRECHARGE    3U
+#define VESC_HOTSWAP_STATE_AUTO_RUNNING      4U
+#define VESC_HOTSWAP_STATE_AUTO_NO_ELIGIBLE  5U
+
+/* Battery state codes 8..15 are reserved. Actual HS enable is reported above. */
+#define VESC_HOTSWAP_BATTERY_STATE_UNKNOWN                  0U
+#define VESC_HOTSWAP_BATTERY_STATE_UNAVAILABLE              1U
+#define VESC_HOTSWAP_BATTERY_STATE_QUALIFYING               2U
+#define VESC_HOTSWAP_BATTERY_STATE_ELIGIBLE                 3U
+#define VESC_HOTSWAP_BATTERY_STATE_WAITING_FOR_IDLE_CURRENT 4U
+#define VESC_HOTSWAP_BATTERY_STATE_WAITING_FOR_VOLTAGE      5U
+#define VESC_HOTSWAP_BATTERY_STATE_CONNECTED                6U
+#define VESC_HOTSWAP_BATTERY_STATE_FAULTED                  7U
+
+#endif /* VESC_HotSwap_Consts_h_ */

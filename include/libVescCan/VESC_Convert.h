@@ -48,11 +48,12 @@ bool VESC_convertStatus7ToRaw(VESC_RawFrame* out, const VESC_Status_7* in);
 
 bool VESC_convertStatus8ToRaw(VESC_RawFrame* out, const VESC_Status_8* in);
 
+/* STATUS_9 rejects non-finite or out-of-range source measurements.
+ * Voltage rounds to 0.1 V and current to 1 mA (halves away from zero).
+ * Temperature and charge truncate to whole units. Rejection leaves out unchanged. */
 bool VESC_convertStatus9ToRaw(VESC_RawFrame* out, const VESC_Status_9* in);
 
 bool VESC_convertStatus10ToRaw(VESC_RawFrame* out, const VESC_Status_10* in);
-
-bool VESC_convertMuxConfig1ToRaw(VESC_RawFrame* out, const VESC_Mux_Config_1* in);
 
 bool VESC_convertMuxCamSelToRaw(VESC_RawFrame* out, const VESC_Mux_CamSel* in);
 
@@ -61,6 +62,14 @@ bool VESC_convertMuxStatusToRaw(VESC_RawFrame* out, const VESC_Mux_Status* in);
 bool VESC_convertStatus11ToRaw(VESC_RawFrame* out, const VESC_Status_11* in);
 
 bool VESC_convertStatus12ToRaw(VESC_RawFrame* out, const VESC_Status_12* in);
+
+/* Device-specific bytes are copied without interpretation, including reserved
+ * fields: SET_CONFIG and HEARTBEAT_STATUS use 2 bytes; STATUS_13 uses 8. */
+bool VESC_convertSetConfigToRaw(VESC_RawFrame* out, const VESC_SetConfig* in);
+
+bool VESC_convertStatus13ToRaw(VESC_RawFrame* out, const VESC_Status_13* in);
+
+bool VESC_convertHeartbeatStatusToRaw(VESC_RawFrame* out, const VESC_Heartbeat_Status* in);
 
 
 //****
@@ -89,8 +98,6 @@ bool VESC_convertRawToStatus9(VESC_Status_9* out, const VESC_RawFrame* in);
 
 bool VESC_convertRawToStatus10(VESC_Status_10* out, const VESC_RawFrame* in);
 
-bool VESC_convertRawToMuxConfig1(VESC_Mux_Config_1* out, const VESC_RawFrame* in);
-
 bool VESC_convertRawToMuxCamSel(VESC_Mux_CamSel* out, const VESC_RawFrame* in);
 
 bool VESC_convertRawToMuxStatus(VESC_Mux_Status* out, const VESC_RawFrame* in);
@@ -98,5 +105,12 @@ bool VESC_convertRawToMuxStatus(VESC_Mux_Status* out, const VESC_RawFrame* in);
 bool VESC_convertRawToStatus11(VESC_Status_11* out, const VESC_RawFrame* in);
 
 bool VESC_convertRawToStatus12(VESC_Status_12* out, const VESC_RawFrame* in);
+
+/* Reject NULL, a different command, or a nonmatching DLC without changing out. */
+bool VESC_convertRawToSetConfig(VESC_SetConfig* out, const VESC_RawFrame* in);
+
+bool VESC_convertRawToStatus13(VESC_Status_13* out, const VESC_RawFrame* in);
+
+bool VESC_convertRawToHeartbeatStatus(VESC_Heartbeat_Status* out, const VESC_RawFrame* in);
 
 #endif //VESC_Convert_h_
